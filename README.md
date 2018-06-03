@@ -6,6 +6,6 @@ This repository contains the source files I used to create my application, a rep
 
 
 ## Useful links
-* The Scientist and Engineer's Guide to Digital Signal Processing, by Steven W. Smith, Ph.D. He offers the digital version of his book [here] (http://dspguide.com/pdfbook.htm "The Scientist and Engineer's Guide to Digital Signal Processing's Table of Content")
-* You can learn about JUCE [here] (https://juce.com/ "JUCE | JUCE")
-* JUCE's class index can be found [here] (https://docs.juce.com/master/classes.html "JUCE: Class Index")
+* The Scientist and Engineer's Guide to Digital Signal Processing, by Steven W. Smith, Ph.D. He offers the digital version of his book [here](http://dspguide.com/pdfbook.htm "The Scientist and Engineer's Guide to Digital Signal Processing's Table of Content")
+* You can learn about JUCE [here](https://juce.com/ "JUCE | JUCE")
+* JUCE's class index can be found [here](https://docs.juce.com/master/classes.html "JUCE: Class Index")
