@@ -1,10 +1,9 @@
 /*
   ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic startup code for a JUCE application.
-
+ 
+    Main.cpp
+    Author:  Nicholas Lenz
+ 
   ==============================================================================
 */
 

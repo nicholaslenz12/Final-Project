@@ -1,8 +1,9 @@
 /*
   ==============================================================================
-
-    This file was auto-generated!
-
+ 
+    MainComponent.cpp
+    Author:  Nicholas Lenz
+ 
   ==============================================================================
 */
 
@@ -11,12 +12,15 @@
 //==============================================================================
 MainComponent::MainComponent()
 {
-    // Make sure you set the size of the component after
-    // you add any child components.
+    // Sets the size of the application
     setSize (800, 600);
 
     // specify the number of input and output channels that we want to open
     setAudioChannels (2, 2);
+    
+    //Makes the spectrum analyzer visable
+    addAndMakeVisible(spectrum);
+    
 }
 
 MainComponent::~MainComponent()
@@ -70,4 +74,11 @@ void MainComponent::resized()
     // This is called when the MainContentComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
+    
+    Rectangle<int> applicationArea = getLocalBounds();
+    Rectangle<int> spectrumArea(applicationArea.getWidth()*3/5,applicationArea.getHeight()*3/5);
+    spectrumArea.setCentre(applicationArea.getCentre());
+    
+    spectrum.setBounds(spectrumArea);
+    
 }
