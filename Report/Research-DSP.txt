@@ -1,14 +1,65 @@
 Research for Project: DSP
 
 Audio Basics:
-The range of human hearing (at best) ranges from 20-20000 Hz, i.e. the human ear responses to pulsations of the air between 20-20000 pulsations per second. Therefore, it does not make very much sense for digital audio to process audio very far outside of this range.
+The range of human hearing (at best) ranges from 20-20000 Hz, i.e. the human ear responses to
+pulsations of the air between 20-20000 pulsations per second. Therefore, it does not make
+very much sense for digital audio to process audio very far outside of this range. Also, the
+ear is more sensitive to higher frequencies than lower ones. The most sensitive region of
+hearing is around 3000 Hz.
 
-Sound waves are converted to a digital signal through a process known as analog to digital conversion. Fundamentally, this is possible because a sound wave is able to vibrate a diaphragm (microphone). This diaphragm is attached to a metal coil, which when slid past a magnet induces a potential in the wire. This potential is measured in volts. Since the pulsation of the air is periodic in time, the measured voltage is periodic in time too. Therefore, it is possible to represent the voltage as a periodic function in time. Some knowledge of analysis tells us that we can construct a Fourier series that is equivalent to the voltage function (so long as the sound is constant!). Each term in the series corresponds to a frequency of human hearing.
+Sound waves are converted to a digital signal through a process known as analog to digital
+conversion. Fundamentally, this is possible because a sound wave is able to vibrate a
+diaphragm (microphone). This diaphragm is attached to a metal coil, which when slid past a
+magnet induces a potential in the wire. This potential is measured in volts. Since the
+pulsation of the air is periodic in time, the measured voltage is periodic in time too.
+Therefore, it is possible to represent the voltage as a periodic function in time. Some
+knowledge of analysis tells us that we can construct a Fourier series that is equivalent to
+the voltage function (so long as the sound is constant!). Each term in the series corresponds
+to a frequency of human hearing.
 
-However, there is a problem. Computers are digital machines and only have finite precision. Therefore, the voltage function cannot be completely represented on a computer. The solution to this problem is to "sample", or rather measure the value of the voltage function a fixed number of times per second. The number of times the function is sampled per second is called the sampling frequency. Also, the value of the function cannot be exactly represented by a computer either. The number of bits used to represent the value of the function at a given time is referred to as the bit depth.
+However, there is a problem. Computers are digital machines and only have finite precision.
+Therefore, the voltage function cannot be completely represented on a computer. The solution
+to this problem is to "sample", or rather measure the value of the voltage function a fixed
+number of times per second. The number of times the function is sampled per second is called
+the sampling frequency. Also, the value of the function cannot be exactly represented by a
+computer either. The number of bits used to represent the value of the function at a given
+time is referred to as the bit depth.
 
-Now the question arises, "How do we choose the sample rate (sampling frequency) and the bit depth?". The first concern is the accurate representation of the audio signal. A poor bit depth means the function will be poorly approximated at each sample, and will result in noise being added to the signal. A poor sampling frequency brings about another problem. When we reconstruct original waveform from the digital version and we have chosen too low of a sampling frequency, then we may have multiple periodic functions that fit the sampled points. And worse if the Fourier series' of the solutions have terms that correspond to frequencies of human hearing, we could reconstruct a very different signal than the original.
+Now the question arises, "How do we choose the sample rate (sampling frequency) and the bit
+depth?". The first concern is the accurate representation of the audio signal. A poor bit
+depth means the function will be poorly approximated at each sample, and will result in noise
+being added to the signal. A poor sampling frequency brings about another problem. When we
+reconstruct original waveform from the digital version and we have chosen too low of a
+sampling frequency, then we may have multiple periodic functions that fit the sampled points.
+And worse if the Fourier series' of the solutions have terms that correspond to frequencies
+of human hearing, we could reconstruct a very different signal than the original.
 
-The solution to this problem is a given by the Nyquist-Shannon Sampling Theorem; put shortly, the theorem says the maximum accurately reconstructable frequency from a sampled signal is equal to half the sample rate. In other words, if we choose a sampling rate of 20000 HZ, we can only accurately reconstruct signals up to 10000 Hz (we may also have frequencies above 10000 Hz though). From the theorem, we could therefore choose any sampling frequency above 40000 Hz to reconstruct a signal to that is reconstructed accurately to human perception. The standard for audio at the present is 44100 Hz. 
+The solution to this problem is a given by the Nyquist-Shannon Sampling Theorem; put shortly,
+the theorem says the maximum accurately reconstructable frequency from a sampled signal is
+equal to half the sample rate. In other words, if we choose a sampling rate of 20000 HZ, we
+can only accurately reconstruct signals up to 10000 Hz (we may also have frequencies above
+10000 Hz though). From the theorem, we could therefore choose any sampling frequency above
+40000 Hz to reconstruct a signal to that is reconstructed accurately to human perception. The
+standard for audio at the present is 44100 Hz. 
 
-Volume in the real world is measure logarithmically relative to some reference sound. In digital audio a signal is normalize so that the sampled values vary between values -1 and 1. A waveform with amplitude 1 is referred to being at volume 0 dBFS (decibels full scale). Two waveforms with amplitudes A and A/2 have volumes V and V - 6 respectively, where the first sound is considered twice as a loud. Therefore to change a signal's amplitude by n apply the function 2^(n/6). The discussion of volume brings about the choice of bit depth. A higher bit depth means the level of noise induced in the signal by conversed from digital to analog is lower in volume. For us a choice of 16 - 24 bits will be sufficient.
+Volume in the real world is measure logarithmically relative to some reference sound. In
+digital audio a signal is normalize so that the sampled values vary between values -1 and 1.
+A waveform with amplitude 1 is referred to being at volume 0 dBFS (decibels full scale). Two
+waveforms with amplitudes A and A/2 have volumes V and V - 6 respectively, where the first
+sound is considered twice as a loud. Therefore to change a signal's amplitude by n apply the
+function 2^(n/6). The discussion of volume brings about the choice of bit depth. A higher bit
+depth means the level of noise induced in the signal by conversed from digital to analog is
+lower in volume. For us a choice of 16 - 24 bits will be sufficient.
+
+Frequency, when visualized is also scaled logarithmically. The reason for this is that an
+octave is defined as the range of frequencies between a base note (a musical frequency) and
+all notes up to the note that has twice the frequency of the base note. When all the
+frequencies of a signal are displayed logarithmically, the width of each octave is the same
+(since for any x>0, n a natural number, log(x^n) = n*log(x) so log(x^(n+1)) - log(x^n) = nlog(x).
+
+To convert a digital signal so that it can be visualized as frequencies we apply a transform
+that converts a sequence of samples into a function with a domain of frequency, and codomain
+of volume. A common transform is the Fourier Transform, however since we are working with a
+discrete (not infinite in time) signal we must use the DFT, Discrete Fourier Transform.
+The most common, and most efficient implementation of the DFT is the FFT, Fast Fourier
+Transform, which has time complexity O(nlog(n)).
