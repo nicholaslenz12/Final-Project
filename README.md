@@ -19,3 +19,5 @@ This repository contains the source files I used to create my application, a rep
 * You can learn about JUCE [here](https://juce.com/ "JUCE | JUCE").
 * JUCE's class index can be found [here](https://docs.juce.com/master/classes.html "JUCE: Class Index").
 
+## Here's a picture of my app:
+![Spectrum Analysis](BareBones.png)
