@@ -1,9 +1,38 @@
 Relevance to PIC 10C:
 
-Notes on why I chose JUCE over Qt:
-1) First and the most important reason is that JUCE is a framework that was created for the purpose of real-time audio processing, while Qt is for more general development.
-2) I have been looking into JUCE for about a year now so I am slightly familiar with how the framework is set up.
-3) JUCE's sliders, spin-boxes and other features are similar to Qt's respective features. So, my understanding of Qt translates rather well to JUCE.
+=======================================================================================================
 
-How I plan to use what I learned from PIC 10C in my application:
- 
+Notes on why I chose JUCE over Qt:
+1) First and the most important reason is that JUCE is a framework that was created for the purpose of
+real-time audio processing, while Qt is for more general development.
+2) I have been looking into JUCE for about (now that I think about it) half a year now so I am slightly
+familiar with how the framework is set up.
+3) JUCE's sliders, spin-boxes and other features are similar to Qt's respective features. So, my
+understanding of Qt translates rather well to JUCE. Also, JUCE is similar to Qt in that the buttons,
+sliders, and sub-content windows are all controlled ultimately by the MainContentComponent. This means
+that when the parent object is deleted (the application is closed), the parent releases the dynamically
+allocated memory that the child objects store. This is done recursively until every child's memory has
+been deleted.
+
+My Struggle (with JUCE):
+----> To understand this section you may need to read Research-DSP located in the same directory <----
+
+Preliminaries:
+All timing within the application is done in terms of the sample rate, which I will default to 44100 Hz
+because there is usually very little need to go above that point. Programs created with JUCE are also
+multi-threaded, i.e. one thread is used for the GUI of the application and the other is used for the
+audio processing. Thanks to Stephanie I know that one thread will need to be locked when I try to send
+signals between the two or else I could mis-process the audio signal. By this I mean that the audio
+thread will probably need to be locked when I make changes when using the GUI or else changes in the
+GUI will be interpreted as instantaneous changes in the audio signal which will cause pops and clicks
+(I learned about this phenomenon in Mark Finke's blog post "Making Audio Plugins Part 4: VST and AU
+Targets" on creating an audio plug-in, see my "Useful links" for the link). 
+
+While Coding:
+-> Organizing the component windows in JUCE is very unintuitive. The removeFromTop and similar member functions of the Rectangle class not only remove the area of the window that is requested, but also slides the Rectangle in the direction of the removed area. After some finagling I managed to get the Rectangle in the right spot, but when resized the rectangle moved away from the center of the GUI. So, I instead opted for using setCentre and setBounds member functions for organizing my objects, which appear to offer more control.
+
+
+=======================================================================================================
+
+How I used things from PIC 10C
+
