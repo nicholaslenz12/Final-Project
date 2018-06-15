@@ -1,10 +1,10 @@
 /*
-  ==============================================================================
+  ==============================================================================================================
  
     MainComponent.h
     Author:  Nicholas Lenz
  
-   ==============================================================================
+   ==============================================================================================================
  */
 
 #pragma once
@@ -22,18 +22,29 @@ public:
     MainComponent();
     ~MainComponent();
 
-    //==============================================================================
+    //==============================================================================================================
     void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
     void getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) override;
     void releaseResources() override;
 
-    //==============================================================================
+    //==============================================================================================================
     void paint (Graphics& g) override;
     void resized() override;
 
-//==================================================================================
+//==================================================================================================================
     
 private:
+    /**
+     Provides the functionality for the Open button being clicked. The functionality
+        is based on the open button created as JUCE's tutorial "Making an Audio
+        Player", as it provides the basics for opening a file for use in an
+        application.
+     */
+    void openClicked();
+    
+    
+    //==============================================================================================================
+    
     // Every text button will appear on the GUI.
     TextButton open;    // Object so that I can open a file.
     TextButton play;    // Object so that I can play the selected file.
@@ -42,6 +53,8 @@ private:
     
     
     SpectralViewComponent spectrum;
+    AudioFormatManager filetypeManager;
+    std::unique_ptr<AudioFormatReaderSource> fileSource;
     AudioTransportSource soundFile;
     
     

@@ -1,15 +1,15 @@
 /*
-  ==============================================================================
+  ==============================================================================================================
  
     MainComponent.cpp
     Author:  Nicholas Lenz
  
-  ==============================================================================
+  ==============================================================================================================
 */
 
 #include "MainComponent.h"
 
-//==============================================================================
+//==============================================================================================================
 MainComponent::MainComponent()
 {
     // Sets the size of the application.
@@ -40,6 +40,9 @@ MainComponent::MainComponent()
     stop.setColour(TextButton::buttonColourId, Colour(255,96,22));
     stop.setColour(TextButton::textColourOffId, Colours::black);
     
+    // Provides the functionality for the buttons, i.e. once they are clicked
+    open.onClick = [this] { openClicked(); };
+    
     // Makes the spectrum analyzer visable.
     addAndMakeVisible(&spectrum);
     
@@ -51,7 +54,26 @@ MainComponent::~MainComponent()
     shutdownAudio();
 }
 
-//==============================================================================
+//==============================================================================================================
+void MainComponent::openClicked()
+{
+    FileChooser findFile("Select an audio file to play.");
+    
+    
+    if( findFile.browseForFileToOpen() ) // If the native file browser opens and the user opens a file.
+                                          
+    {
+        File selectedFile = findFile.getResult(); // Sets the selected file to the
+        AudioFormatReader* fileReader = filetypeManager.createReaderFor(selectedFile);
+        if( fileReader )
+        {
+            std::unique_ptr<AudioFormatReaderSource> selectedFileSource
+                                                     (new AudioFormatReaderSource(fileReader,true));
+        }
+    }
+}
+
+//==============================================================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
     // This function will be called when the audio device is started, or when
@@ -82,7 +104,7 @@ void MainComponent::releaseResources()
     // For more details, see the help for AudioProcessor::releaseResources()
 }
 
-//==============================================================================
+//==============================================================================================================
 void MainComponent::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
@@ -93,10 +115,6 @@ void MainComponent::paint (Graphics& g)
 
 void MainComponent::resized()
 {
-    // This is called when the MainContentComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
-    
     Rectangle<int> applicationArea = getLocalBounds(); // Total area of the GUI.
     
     // Sets the region for the spectral view.
@@ -125,7 +143,6 @@ void MainComponent::resized()
     Rectangle<int> stopArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*1/10);
     stopArea.setPosition(pauseArea.getBottomLeft());
     stop.setBounds(stopArea);
-    
 }
 
 

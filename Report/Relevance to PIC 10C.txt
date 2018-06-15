@@ -49,5 +49,12 @@ resizing if this becomes an issue later.
 =======================================================================================================
 
 How I used things from PIC 10C:
--> The majority of what I learned in PIC 10C will be used in computations the SpectralViewComponent.cpp. 
+-> The onClick member function returns a std::function wrapped function with form void. Thus, it seems
+to be customary (from the JUCE website) for the a lambda function to be wrapped having taken its parent
+component as a captured value. The code within the lambda function is what's then called on the button
+click, which should call another member function of the parent component (i.e. a function within the
+same cpp file). The necessary effect of pressing the button should follow.
+-> When an audio file is read from a directory, memory for handling the audio is dynamically allocated,
+which is handled by a unique_ptr. The information about the file is read (i.e. it's sample rate and
+size), which is followed by unique_ptr::release which releases the memory. 
 
