@@ -15,7 +15,7 @@ allocated memory that the child objects store. This is done recursively until ev
 been deleted.
 
 My Struggle (with JUCE):
-----> To understand this section you may need to read Research-DSP located in the same directory <----
+--> To understand this section you may need to read Research-DSP.txt located in the same directory <--
 
 Preliminaries:
 All timing within the application is done in terms of the sample rate, which I will default to 44100 Hz
@@ -29,10 +29,25 @@ GUI will be interpreted as instantaneous changes in the audio signal which will 
 Targets" on creating an audio plug-in, see my "Useful links" for the link). 
 
 While Coding:
--> Organizing the component windows in JUCE is very unintuitive. The removeFromTop and similar member functions of the Rectangle class not only remove the area of the window that is requested, but also slides the Rectangle in the direction of the removed area. After some finagling I managed to get the Rectangle in the right spot, but when resized the rectangle moved away from the center of the GUI. So, I instead opted for using setCentre and setBounds member functions for organizing my objects, which appear to offer more control.
+-> Organizing the component windows in JUCE is very unintuitive. The removeFromTop and similar member
+functions of the Rectangle class not only remove the area of the window that is requested, but also
+slides the Rectangle in the direction of the removed area. After some finagling I managed to get the
+Rectangle in the right spot, but when resized the rectangle moved away from the center of the GUI. So,
+I instead opted for using setCentre and setBounds member functions for organizing my objects, which
+appear to offer more control.
+-> Once I create the region of the GUI that houses the main spectrum view, I had problems getting the
+open, play, pause, and stop buttons to show up on the GUI. To fix this I had set the regions of the
+buttons as Rectangle objects and place them in the GUI manually.
+-> Creating a GUI is not as painless Qt, since you have to manually place every button on the GUI (as
+far as I'm aware). The process of getting the buttons placed so that the GUI resizes correctly is even
+more tedious because the every button needs to be placed in terms of the "Local Bounds" or relative to
+it's parent component. The nice thing at the end of this entire process is that the application can be
+resized if the user so chooses, just by dragging the bottom corner. I did discover that I can turn off
+resizing if this becomes an issue later.
 
 
 =======================================================================================================
 
-How I used things from PIC 10C
+How I used things from PIC 10C:
+-> The majority of what I learned in PIC 10C will be used in computations the SpectralViewComponent.cpp. 
 

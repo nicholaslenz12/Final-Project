@@ -32,7 +32,7 @@ void SpectralViewComponent::paint (Graphics& g)
        You should replace everything in this method with your own
        drawing code..
     */
-    g.fillAll(Colour(255,154,22));
+    g.fillAll(Colour(255,154,22)); // Sets the color of the background to a nice color I found.
     
 //    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
 //
