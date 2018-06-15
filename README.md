@@ -21,4 +21,4 @@ This repository contains the source files I used to create my application, a rep
 * Mark Finke's blog on making an audio plug-in is located [here](http://www.martin-finke.de/blog/tags/making_audio_plugins.html "Mark Finke's Blog").
 
 ## Here's a picture of my app:
-![Spectrum Analysis](BareBones.png)
+![Spectrum Analysis](MyGUI.png)

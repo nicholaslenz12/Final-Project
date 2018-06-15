@@ -44,6 +44,7 @@ more tedious because the every button needs to be placed in terms of the "Local 
 it's parent component. The nice thing at the end of this entire process is that the application can be
 resized if the user so chooses, just by dragging the bottom corner. I did discover that I can turn off
 resizing if this becomes an issue later.
+-> I ran into several memory leaks once I tried to select files to play from my file browser.
 
 
 =======================================================================================================

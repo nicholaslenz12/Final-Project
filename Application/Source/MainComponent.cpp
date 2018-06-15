@@ -46,6 +46,9 @@ MainComponent::MainComponent()
     // Makes the spectrum analyzer visable.
     addAndMakeVisible(&spectrum);
     
+    filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
+    //projectTime.addChangeListener(this); <======== Might need this later
+    
 }
 
 MainComponent::~MainComponent()
@@ -57,18 +60,23 @@ MainComponent::~MainComponent()
 //==============================================================================================================
 void MainComponent::openClicked()
 {
-    FileChooser findFile("Select an audio file to play.");
+    FileChooser findFile("Select an audio file to play.", File::nonexistent, "");
     
     
     if( findFile.browseForFileToOpen() ) // If the native file browser opens and the user opens a file.
                                           
     {
-        File selectedFile = findFile.getResult(); // Sets the selected file to the
-        AudioFormatReader* fileReader = filetypeManager.createReaderFor(selectedFile);
-        if( fileReader )
+        auto selectedFile = findFile.getResult(); // Sets the selected file to the one choosen.
+        auto* fileReader = filetypeManager.createReaderFor(selectedFile); // Creates a file reader.
+        if( fileReader ) // If successful.
         {
+            // Access the necessary information from the file such as its sample rate. Also, we choose if
+            // the file will be segmented and processed on separate threads (which we are not going to do).
             std::unique_ptr<AudioFormatReaderSource> selectedFileSource
                                                      (new AudioFormatReaderSource(fileReader,true));
+            projectTime.setSource(selectedFileSource.get(), 0, nullptr, fileReader->sampleRate);
+            play.setEnabled(true); // Prepares the play button so that it can play.
+            fileSource.reset(selectedFileSource.release());
         }
     }
 }

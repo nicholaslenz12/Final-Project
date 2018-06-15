@@ -17,8 +17,8 @@ public:
     //==============================================================================
     ApplicationApplication() {}
 
-    const String getApplicationName() override       { return ProjectInfo::projectName; }
-    const String getApplicationVersion() override    { return ProjectInfo::versionString; }
+    const String getApplicationName() override       { return "SpectralView"; }
+    const String getApplicationVersion() override    { return "1.0"; }
     bool moreThanOneInstanceAllowed() override       { return true; }
 
     //==============================================================================

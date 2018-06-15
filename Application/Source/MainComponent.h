@@ -55,7 +55,7 @@ private:
     SpectralViewComponent spectrum;
     AudioFormatManager filetypeManager;
     std::unique_ptr<AudioFormatReaderSource> fileSource;
-    AudioTransportSource soundFile;
+    AudioTransportSource projectTime;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
