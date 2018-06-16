@@ -16,7 +16,7 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent   : public AudioAppComponent, public ChangeListener
+class MainComponent   : public AudioAppComponent, public ChangeListener, public Timer
 {
 public:
     MainComponent();
@@ -83,6 +83,12 @@ private:
      */
     void changeListenerCallback (ChangeBroadcaster* source) override;
     
+    /**
+     This function is called every x milliseconds specified by the function startTimer( x ).
+     */
+    void timerCallback() override;
+    
+    
     //==============================================================================================================
     
     // Every text button will appear on the GUI.
@@ -91,13 +97,18 @@ private:
     TextButton pause;   // Object so that I can pause the selected file.
     TextButton stop;    // Object so that I can stop the selected file.
     
-    
     SpectralViewComponent spectrum; // Component that holds the functionality of the spectrum-viewer.
+    Slider transportProgress; // Object that shows how far through the audio file we are.
+    
+    
     AudioFormatManager filetypeManager; // Manages the file type (.mp3, .wav, ...).
     std::unique_ptr<AudioFormatReaderSource> fileSource; // Points to source properties of the file.
     AudioTransportSource projectSource; // Corresponds to the file loaded into the project and its timing
                                         // Within the project.
-    playState state;
+    playState state;                    // State of viewer: Playing, Starting, Stopping, Stopped, or Paused.
+    double projectTime;                 // Current time at the source file.
+    int64 fileLength;                   // Length of the project in samples.
+    double sampleFreq;                   // Sample rate of the selected file.
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

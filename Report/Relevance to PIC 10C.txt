@@ -54,6 +54,8 @@ of receiving audio blocks or else the application will overload/crash/produce er
 were being toggled). The issue was that I need to inherit from the CallbackListener class, and I then
 had to define the virtual function changeCallbackListener so that my mainComponent could be instantiated.
 -> I seem to have a habit of forgetting to break out of switch.
+-> I discover that my first major bug was a missing lambda function, which means that whenever the play
+button was pressed the signal was never sent to start the audio.
 
 
 =======================================================================================================

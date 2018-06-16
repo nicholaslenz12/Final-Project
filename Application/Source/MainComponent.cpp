@@ -10,7 +10,7 @@
 #include "MainComponent.h"
 
 //==============================================================================================================
-MainComponent::MainComponent() : state(Stopped)
+MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(0), sampleFreq(44100)
 {
     // Sets the size of the application.
     setSize (800, 600);
@@ -47,11 +47,14 @@ MainComponent::MainComponent() : state(Stopped)
     
     // Provides the functionality for the buttons, i.e. once they are clicked
     open.onClick  = [this] { openClicked(); };
+    play.onClick  = [this] { playClicked(); };
     pause.onClick = [this] { pauseClicked(); };
     stop.onClick  = [this] { stopClicked(); };
     
-    // Makes the spectrum analyzer visable.
+    // Makes the spectrum analyzer and the audio progress bar visable.
     addAndMakeVisible(&spectrum);
+    addAndMakeVisible(&transportProgress);
+    startTimer(33); // 30 frame per second corresponds to ~33.3 or 33 milliseconds.
     
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
     projectSource.addChangeListener(this); // Adds a listener for button presses.
@@ -81,31 +84,34 @@ void MainComponent::openClicked()
             std::unique_ptr<AudioFormatReaderSource> selectedFileSource
                                                      (new AudioFormatReaderSource(fileReader,true));
             projectSource.setSource(selectedFileSource.get(), 0, nullptr, fileReader->sampleRate);
+            fileLength = selectedFileSource->getTotalLength();
+            sampleFreq = fileReader->sampleRate;
             play.setEnabled(true); // Prepares the play button so that it can play.
             fileSource.reset(selectedFileSource.release());
         }
+        
     }
 }
 
 void MainComponent::playClicked()
 {
-    //pause.setToggleState(false, NotificationType::dontSendNotification);
-    //stop.setToggleState(false, NotificationType::dontSendNotification);
+    pause.setToggleState(false, NotificationType::dontSendNotification);
+    stop.setToggleState(false, NotificationType::dontSendNotification);
     changeState(Starting);
 }
 
 void MainComponent::pauseClicked()
 {
 
-    //pause.setToggleState(true, NotificationType::dontSendNotification);
-    //stop.setToggleState(false, NotificationType::dontSendNotification);
+    pause.setToggleState(true, NotificationType::dontSendNotification);
+    stop.setToggleState(false, NotificationType::dontSendNotification);
     changeState(Pausing);
 }
 
 void MainComponent::stopClicked()
 {
-    //pause.setToggleState(false, NotificationType::dontSendNotification);
-    //stop.setToggleState(true, NotificationType::dontSendNotification);
+    pause.setToggleState(false, NotificationType::dontSendNotification);
+    stop.setToggleState(true, NotificationType::dontSendNotification);
     changeState(Stopping);
 }
 
@@ -118,7 +124,7 @@ void MainComponent::changeState(playState newState)
         switch(state)
         {
             case Stopped:
-                stop.setEnabled(false);
+                stop.setEnabled(true);
                 pause.setEnabled(false);
                 play.setEnabled(true);
                 if(pause.getToggleState())
@@ -163,6 +169,12 @@ void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
     }
 }
 
+void MainComponent::timerCallback()
+{
+    projectTime = projectSource.getCurrentPosition();
+    double percentThrough = (projectTime)/(static_cast<double>(fileLength)/sampleFreq);
+    transportProgress.setValue(percentThrough);
+}
 
 
 //==============================================================================================================
@@ -173,7 +185,7 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
-    if( !fileSource ) // If there is no current file is loaded.
+    if( !(fileSource.get()) ) // If there is no current file is loaded.
     {
         bufferToFill.clearActiveBufferRegion(); // Clear everyting so there's no noise.
     }
@@ -198,11 +210,6 @@ void MainComponent::resized()
 {
     Rectangle<int> applicationArea = getLocalBounds(); // Total area of the GUI.
     
-    // Sets the region for the spectral view.
-    Rectangle<int> spectrumArea(getLocalBounds().getWidth()*4/5,getLocalBounds().getHeight()*4/5);
-    spectrumArea.setCentre(getLocalBounds().getCentre());
-    spectrum.setBounds(spectrumArea);
-
     // Sets the region for the open file button.
     Rectangle<int> openArea(getLocalBounds().getWidth(),getLocalBounds().getHeight()*1/10);
     openArea.setTop(getLocalBounds().getY());
@@ -219,11 +226,20 @@ void MainComponent::resized()
     pauseArea.setPosition(playArea.getBottomLeft());
     pause.setBounds(pauseArea);
     
-    
     // Sets the region for the stop file button.
     Rectangle<int> stopArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*4/15);
     stopArea.setPosition(pauseArea.getBottomLeft());
     stop.setBounds(stopArea);
+    
+    // Sets the region for the spectral view.
+    Rectangle<int> spectrumArea(getLocalBounds().getWidth()*4/5,getLocalBounds().getHeight()*4/5);
+    spectrumArea.setCentre(getLocalBounds().getCentre());
+    spectrum.setBounds(spectrumArea);
+    
+    // Sets the region for the progess bar.
+    Rectangle<int> progressBarArea(getLocalBounds().getWidth(),getLocalBounds().getHeight()*1/10);
+    progressBarArea.setPosition(stopArea.getBottomLeft());
+    transportProgress.setBounds(progressBarArea);
 }
 
 
