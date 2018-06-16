@@ -54,7 +54,7 @@ MainComponent::MainComponent() : state(Stopped)
     addAndMakeVisible(&spectrum);
     
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
-    //projectTime.addChangeListener(this); <======== Might need this later
+    projectSource.addChangeListener(this); // Adds a listener for button presses.
     
 }
 
@@ -68,7 +68,6 @@ MainComponent::~MainComponent()
 void MainComponent::openClicked()
 {
     FileChooser findFile("Select an audio file to play.", File::nonexistent, "");
-    
     
     if( findFile.browseForFileToOpen() ) // If the native file browser opens and the user opens a file.
                                           
@@ -90,10 +89,25 @@ void MainComponent::openClicked()
 
 void MainComponent::playClicked()
 {
+    //pause.setToggleState(false, NotificationType::dontSendNotification);
+    //stop.setToggleState(false, NotificationType::dontSendNotification);
     changeState(Starting);
-    play.setToggleState(true, NotificationType::dontSendNotification);
 }
 
+void MainComponent::pauseClicked()
+{
+
+    //pause.setToggleState(true, NotificationType::dontSendNotification);
+    //stop.setToggleState(false, NotificationType::dontSendNotification);
+    changeState(Pausing);
+}
+
+void MainComponent::stopClicked()
+{
+    //pause.setToggleState(false, NotificationType::dontSendNotification);
+    //stop.setToggleState(true, NotificationType::dontSendNotification);
+    changeState(Stopping);
+}
 
 void MainComponent::changeState(playState newState)
 {
@@ -107,13 +121,15 @@ void MainComponent::changeState(playState newState)
                 stop.setEnabled(false);
                 pause.setEnabled(false);
                 play.setEnabled(true);
-                projectSource.setPosition(0.0);
+                if(pause.getToggleState())
+                {
+                    projectSource.setPosition(projectSource.getCurrentPosition());
+                }
+                if(stop.getToggleState())
+                {
+                    projectSource.setPosition(0.0);
+                }
                 break;
-            case Paused:
-                stop.setEnabled(false);
-                pause.setEnabled(false);
-                play.setEnabled(true);
-                projectSource.setPosition(projectSource.getCurrentPosition());
             case Starting:
                 play.setEnabled(false);
                 projectSource.start();
@@ -121,15 +137,33 @@ void MainComponent::changeState(playState newState)
             case Playing:
                 stop.setEnabled(true);
                 pause.setEnabled(true);
+                break;
             case Pausing:
-                
-                
-            case Stopping
                 projectSource.stop();
-                
+                break;
+            case Stopping:
+                projectSource.stop();
+                break;
         }
     }
 }
+
+void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
+{
+    if( source == &projectSource ) // If the source of the callback is the projects source audio file.
+    {
+        if( projectSource.isPlaying() ) // Checks to see if the project is playing.
+        {
+            changeState(Playing); // If so changes the stat to playing.
+        }
+        else
+        {
+            changeState(Stopped); // If not changes it to stopped.
+        }
+    }
+}
+
+
 
 //==============================================================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)

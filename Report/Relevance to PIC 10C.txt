@@ -50,6 +50,10 @@ given file.
 -> It appears to be audio processing occurs first at the level of audio blocks, which is a collection
 (of fixed size) of contiguous samples. Audio processing must happen faster than the application's rate
 of receiving audio blocks or else the application will overload/crash/produce erroneous output.
+-> I ran into the issue of my project not reacting to button presses (the audio was unchanged, but they
+were being toggled). The issue was that I need to inherit from the CallbackListener class, and I then
+had to define the virtual function changeCallbackListener so that my mainComponent could be instantiated.
+-> I seem to have a habit of forgetting to break out of switch.
 
 
 =======================================================================================================
@@ -65,5 +69,5 @@ which is handled by a unique_ptr. The information about the file is read (i.e. i
 size), which is followed by unique_ptr::release which releases the memory.
 -> I learned from homework #1 that you can enumerate values for a variable in C++, so that it only takes
 on the specific named values. The JUCE framework sometimes enumerates private variables to make working
-with the classes more intuitive. 
+with the classes more intuitive.
 
