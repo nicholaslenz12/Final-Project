@@ -10,10 +10,10 @@
 #include "MainComponent.h"
 
 //==============================================================================================================
-MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(0), sampleFreq(44100)
+MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1), sampleFreq(44100)
 {
     // Sets the size of the application.
-    setSize (800, 600);
+    setSize (600, 400);
 
     // Specifies the number of input and output channels that we want to open.
     setAudioChannels (2, 2);
@@ -25,7 +25,7 @@ MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(0)
     addAndMakeVisible(&stop);
     
     // Sets what all the text buttons say.
-    open.setButtonText("Open File");
+    open.setButtonText("---> Open a File <---");
     play.setButtonText("Play");
     pause.setButtonText("Pause");
     stop.setButtonText("Stop");
@@ -54,6 +54,10 @@ MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(0)
     // Makes the spectrum analyzer and the audio progress bar visable.
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&transportProgress);
+    transportProgress.setRange(0, 100);
+    transportProgress.setTextValueSuffix("%");
+    transportProgress.setNumDecimalPlacesToDisplay(1);
+    transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 60, 25);
     startTimer(33); // 30 frame per second corresponds to ~33.3 or 33 milliseconds.
     
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
@@ -84,11 +88,12 @@ void MainComponent::openClicked()
             std::unique_ptr<AudioFormatReaderSource> selectedFileSource
                                                      (new AudioFormatReaderSource(fileReader,true));
             projectSource.setSource(selectedFileSource.get(), 0, nullptr, fileReader->sampleRate);
-            fileLength = selectedFileSource->getTotalLength();
             sampleFreq = fileReader->sampleRate;
+            fileLength = (static_cast<double>(fileReader->lengthInSamples)/sampleFreq);
             play.setEnabled(true); // Prepares the play button so that it can play.
             fileSource.reset(selectedFileSource.release());
         }
+        open.setButtonText(selectedFile.getFileName());
         
     }
 }
@@ -127,10 +132,6 @@ void MainComponent::changeState(playState newState)
                 stop.setEnabled(true);
                 pause.setEnabled(false);
                 play.setEnabled(true);
-                if(pause.getToggleState())
-                {
-                    projectSource.setPosition(projectSource.getCurrentPosition());
-                }
                 if(stop.getToggleState())
                 {
                     projectSource.setPosition(0.0);
@@ -156,11 +157,11 @@ void MainComponent::changeState(playState newState)
 
 void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
 {
-    if( source == &projectSource ) // If the source of the callback is the projects source audio file.
+    if( source == &projectSource ) // If the source of the callback is the project's source audio file.
     {
         if( projectSource.isPlaying() ) // Checks to see if the project is playing.
         {
-            changeState(Playing); // If so changes the stat to playing.
+            changeState(Playing); // If so changes the state to playing.
         }
         else
         {
@@ -172,7 +173,8 @@ void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
 void MainComponent::timerCallback()
 {
     projectTime = projectSource.getCurrentPosition();
-    double percentThrough = (projectTime)/(static_cast<double>(fileLength)/sampleFreq);
+    transportProgress.setValue(projectTime);
+    double percentThrough = 100*projectTime/fileLength;
     transportProgress.setValue(percentThrough);
 }
 
@@ -237,7 +239,7 @@ void MainComponent::resized()
     spectrum.setBounds(spectrumArea);
     
     // Sets the region for the progess bar.
-    Rectangle<int> progressBarArea(getLocalBounds().getWidth(),getLocalBounds().getHeight()*1/10);
+    Rectangle<int> progressBarArea(getLocalBounds().getWidth()*9/10,getLocalBounds().getHeight()*1/10);
     progressBarArea.setPosition(stopArea.getBottomLeft());
     transportProgress.setBounds(progressBarArea);
 }

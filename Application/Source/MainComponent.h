@@ -107,8 +107,8 @@ private:
                                         // Within the project.
     playState state;                    // State of viewer: Playing, Starting, Stopping, Stopped, or Paused.
     double projectTime;                 // Current time at the source file.
-    int64 fileLength;                   // Length of the project in samples.
-    double sampleFreq;                   // Sample rate of the selected file.
+    double fileLength;                  // Length of the project in seconds.
+    double sampleFreq;                  // Sample rate of the selected file.
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
