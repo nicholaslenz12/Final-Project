@@ -51,6 +51,8 @@ MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1)
     pause.onClick = [this] { pauseClicked(); };
     stop.onClick  = [this] { stopClicked(); };
     
+    stop.addListener(this);
+    
     // Makes the spectrum analyzer and the audio progress bar visable.
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&transportProgress);
@@ -58,7 +60,7 @@ MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1)
     transportProgress.setTextValueSuffix("%");
     transportProgress.setNumDecimalPlacesToDisplay(1);
     transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 60, 25);
-    startTimer(33); // 30 frame per second corresponds to ~33.3 or 33 milliseconds.
+    startTimer(333); // 3 frames per second corresponds to ~333.3 or 333 milliseconds.
     
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
     projectSource.addChangeListener(this); // Adds a listener for button presses.
@@ -122,20 +124,23 @@ void MainComponent::stopClicked()
 
 void MainComponent::changeState(playState newState)
 {
+    
     if(state != newState)
     {
         state = newState;
         
         switch(state)
         {
-            case Stopped:
+            case Paused:
                 stop.setEnabled(true);
                 pause.setEnabled(false);
                 play.setEnabled(true);
-                if(stop.getToggleState())
-                {
-                    projectSource.setPosition(0.0);
-                }
+                break;
+            case Stopped:
+                stop.setEnabled(false);
+                pause.setEnabled(false);
+                play.setEnabled(true);
+                projectSource.setPosition(0.0);
                 break;
             case Starting:
                 play.setEnabled(false);
@@ -155,6 +160,14 @@ void MainComponent::changeState(playState newState)
     }
 }
 
+void MainComponent::buttonClicked(Button* button)
+{
+    if( button == &stop )
+    {
+        changeState(Stopped);
+    }
+}
+
 void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
 {
     if( source == &projectSource ) // If the source of the callback is the project's source audio file.
@@ -163,9 +176,13 @@ void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
         {
             changeState(Playing); // If so changes the state to playing.
         }
+        else if( pause.getToggleState() )
+        {
+            changeState(Paused);
+        }
         else
         {
-            changeState(Stopped); // If not changes it to stopped.
+            changeState(Stopped);
         }
     }
 }

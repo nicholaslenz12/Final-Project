@@ -64,7 +64,9 @@ The sliders by default seem to give about 10 digits of precision, which is far t
 to display through progress through a file.
 -> I seem to have a bug when I pause the audio, I can't set the playback to play from the start (I can
 only reset it when I'm currently playing). I suspect it has to do with my lack of understanding how the
-changeListenerCallback function works.
+changeListenerCallback function works. I fixed this issue by creating a specific reaction for pressing
+the stop button.
+
 
 
 =======================================================================================================
@@ -81,4 +83,6 @@ size), which is followed by unique_ptr::release which releases the memory.
 -> I learned from homework #1 that you can enumerate values for a variable in C++, so that it only takes
 on the specific named values. The JUCE framework sometimes enumerates private variables to make working
 with the classes more intuitive.
+-> I accidentally messed up a git merge which resulted me in looking some time, luckily I was able to
+clone from the remote repository and copy in the files to the point where I just was.
 

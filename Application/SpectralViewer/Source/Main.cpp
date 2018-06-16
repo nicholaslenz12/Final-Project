@@ -17,7 +17,7 @@ public:
     //==============================================================================
     ApplicationApplication() {}
 
-    const String getApplicationName() override       { return "SpectralView"; }
+    const String getApplicationName() override       { return "SpectralViewer"; }
     const String getApplicationVersion() override    { return "1.0"; }
     bool moreThanOneInstanceAllowed() override       { return true; }
 

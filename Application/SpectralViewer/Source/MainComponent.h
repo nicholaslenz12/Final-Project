@@ -16,7 +16,10 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent   : public AudioAppComponent, public ChangeListener, public Timer
+class MainComponent   : public AudioAppComponent,
+                        public ChangeListener,
+                        public Button::Listener,
+                        public Timer
 {
 public:
     MainComponent();
@@ -37,6 +40,7 @@ private:
     //==============================================================================================================
     enum playState // Extending enumeration to the one found in JUCE's "Build an audio player".
     {
+        Paused,
         Stopped,
         Starting,
         Playing,
@@ -75,7 +79,9 @@ private:
         stop buttons.
      */
     void changeState(playState newState);
-    
+    //////////////////////////////
+    void buttonClicked(Button* button) override;
+
     /**
      This function allows the project to actually "listen" for button press and react to
         them. Also, since this function has been defined to the derived class MainComponent,
