@@ -31,11 +31,11 @@ Targets" on creating an audio plug-in, see my "Useful links" for the link).
 While Coding:
 -> Organizing the component windows in JUCE is very unintuitive. The removeFromTop and similar member
 functions of the Rectangle class not only remove the area of the window that is requested, but also
-slides the Rectangle in the direction of the removed area. After some finagling I managed to get the
+slide the Rectangle in the direction of the removed area. After some finagling I managed to get the
 Rectangle in the right spot, but when resized the rectangle moved away from the center of the GUI. So,
 I instead opted for using setCentre and setBounds member functions for organizing my objects, which
 appear to offer more control.
--> Once I create the region of the GUI that houses the main spectrum view, I had problems getting the
+-> Once I created the region of the GUI that houses the main spectrum view, I had problems getting the
 open, play, pause, and stop buttons to show up on the GUI. To fix this I had set the regions of the
 buttons as Rectangle objects and place them in the GUI manually.
 -> Creating a GUI is not as painless Qt, since you have to manually place every button on the GUI (as
@@ -44,7 +44,12 @@ more tedious because the every button needs to be placed in terms of the "Local 
 it's parent component. The nice thing at the end of this entire process is that the application can be
 resized if the user so chooses, just by dragging the bottom corner. I did discover that I can turn off
 resizing if this becomes an issue later.
--> I ran into several memory leaks once I tried to select files to play from my file browser.
+-> I ran into several memory leaks once I tried to select files to play from my file browser. The
+problem was that I had to specify what the known filetypes to the app were, before I could select any
+given file.
+-> It appears to be audio processing occurs first at the level of audio blocks, which is a collection
+(of fixed size) of contiguous samples. Audio processing must happen faster than the application's rate
+of receiving audio blocks or else the application will overload/crash/produce erroneous output.
 
 
 =======================================================================================================
@@ -57,5 +62,8 @@ click, which should call another member function of the parent component (i.e. a
 same cpp file). The necessary effect of pressing the button should follow.
 -> When an audio file is read from a directory, memory for handling the audio is dynamically allocated,
 which is handled by a unique_ptr. The information about the file is read (i.e. it's sample rate and
-size), which is followed by unique_ptr::release which releases the memory. 
+size), which is followed by unique_ptr::release which releases the memory.
+-> I learned from homework #1 that you can enumerate values for a variable in C++, so that it only takes
+on the specific named values. The JUCE framework sometimes enumerates private variables to make working
+with the classes more intuitive. 
 

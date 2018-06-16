@@ -34,14 +34,48 @@ public:
 //==================================================================================================================
     
 private:
+    //==============================================================================================================
+    enum playState // Extending enumeration to the one found in JUCE's "Build an audio player".
+    {
+        Stopped,
+        Paused,
+        Starting,
+        Playing,
+        Stopping,
+        Pausing
+    };
+    
     /**
      Provides the functionality for the Open button being clicked. The functionality
-        is based on the open button created as JUCE's tutorial "Making an Audio
-        Player", as it provides the basics for opening a file for use in an
+        is based on the open button created as JUCE's tutorial "Build an audio
+        player", as it provides the basics for opening a file for use in an
         application.
      */
     void openClicked();
     
+    /**
+     Provides the functionality for the Play button being clicked. Essentially, tells
+        the currently focused spot in the project to move forward in the file.
+     */
+    void playClicked();
+    
+    /**
+     Provides the functionality for the Puase button being clicked. Essentially, tells
+        the currently focused spot in the project to remember its current position.
+     */
+    void pauseClicked();
+    
+    /**
+     Provides the functionality for the Stop button being clicked. Essentially, tells
+        the currently focused spot to move back to the start of the project.
+     */
+    void stopClicked();
+    
+    /**
+     Implements how the app reacts to changes caused by pressing the play, pause, and
+        stop buttons.
+     */
+    void changeState(playState newState);
     
     //==============================================================================================================
     
@@ -52,10 +86,12 @@ private:
     TextButton stop;    // Object so that I can stop the selected file.
     
     
-    SpectralViewComponent spectrum;
-    AudioFormatManager filetypeManager;
-    std::unique_ptr<AudioFormatReaderSource> fileSource;
-    AudioTransportSource projectTime;
+    SpectralViewComponent spectrum; // Component that holds the functionality of the spectrum-viewer.
+    AudioFormatManager filetypeManager; // Manages the file type (.mp3, .wav, ...).
+    std::unique_ptr<AudioFormatReaderSource> fileSource; // Points to source properties of the file.
+    AudioTransportSource projectSource; // Corresponds to the file loaded into the project and its timing
+                                        // Within the project.
+    playState state;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

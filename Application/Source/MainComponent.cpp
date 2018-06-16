@@ -10,7 +10,7 @@
 #include "MainComponent.h"
 
 //==============================================================================================================
-MainComponent::MainComponent()
+MainComponent::MainComponent() : state(Stopped)
 {
     // Sets the size of the application.
     setSize (800, 600);
@@ -25,23 +25,30 @@ MainComponent::MainComponent()
     addAndMakeVisible(&stop);
     
     // Sets what all the text buttons say.
-    open.setButtonText("Open");
+    open.setButtonText("Open File");
     play.setButtonText("Play");
     pause.setButtonText("Pause");
     stop.setButtonText("Stop");
     
+    // Disable all the buttons at the start.
+    play.setEnabled(false);
+    pause.setEnabled(false);
+    stop.setEnabled(false);
+    
     // Sets the colors of the buttons to make them look nicer.
     open.setColour(TextButton::buttonColourId, Colour(255,212,22));
     open.setColour(TextButton::textColourOffId, Colours::black);
-    play.setColour(TextButton::buttonColourId, Colour(255,96,22));
+    play.setColour(TextButton::buttonColourId, Colours::green);
     play.setColour(TextButton::textColourOffId, Colours::black);
-    pause.setColour(TextButton::buttonColourId, Colour(255,96,22));
+    pause.setColour(TextButton::buttonColourId, Colour(255,212,22));
     pause.setColour(TextButton::textColourOffId, Colours::black);
-    stop.setColour(TextButton::buttonColourId, Colour(255,96,22));
+    stop.setColour(TextButton::buttonColourId, Colours::red);
     stop.setColour(TextButton::textColourOffId, Colours::black);
     
     // Provides the functionality for the buttons, i.e. once they are clicked
-    open.onClick = [this] { openClicked(); };
+    open.onClick  = [this] { openClicked(); };
+    pause.onClick = [this] { pauseClicked(); };
+    stop.onClick  = [this] { stopClicked(); };
     
     // Makes the spectrum analyzer visable.
     addAndMakeVisible(&spectrum);
@@ -74,9 +81,52 @@ void MainComponent::openClicked()
             // the file will be segmented and processed on separate threads (which we are not going to do).
             std::unique_ptr<AudioFormatReaderSource> selectedFileSource
                                                      (new AudioFormatReaderSource(fileReader,true));
-            projectTime.setSource(selectedFileSource.get(), 0, nullptr, fileReader->sampleRate);
+            projectSource.setSource(selectedFileSource.get(), 0, nullptr, fileReader->sampleRate);
             play.setEnabled(true); // Prepares the play button so that it can play.
             fileSource.reset(selectedFileSource.release());
+        }
+    }
+}
+
+void MainComponent::playClicked()
+{
+    changeState(Starting);
+    play.setToggleState(true, NotificationType::dontSendNotification);
+}
+
+
+void MainComponent::changeState(playState newState)
+{
+    if(state != newState)
+    {
+        state = newState;
+        
+        switch(state)
+        {
+            case Stopped:
+                stop.setEnabled(false);
+                pause.setEnabled(false);
+                play.setEnabled(true);
+                projectSource.setPosition(0.0);
+                break;
+            case Paused:
+                stop.setEnabled(false);
+                pause.setEnabled(false);
+                play.setEnabled(true);
+                projectSource.setPosition(projectSource.getCurrentPosition());
+            case Starting:
+                play.setEnabled(false);
+                projectSource.start();
+                break;
+            case Playing:
+                stop.setEnabled(true);
+                pause.setEnabled(true);
+            case Pausing:
+                
+                
+            case Stopping
+                projectSource.stop();
+                
         }
     }
 }
@@ -84,41 +134,30 @@ void MainComponent::openClicked()
 //==============================================================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-    // This function will be called when the audio device is started, or when
-    // its settings (i.e. sample rate, block size, etc) are changed.
-
-    // You can use this function to initialise any resources you might need,
-    // but be careful - it will be called on the audio thread, not the GUI thread.
-
-    // For more details, see the help for AudioProcessor::prepareToPlay()
+    projectSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
-    // Your audio-processing code goes here!
-
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
-
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-    bufferToFill.clearActiveBufferRegion();
+    if( !fileSource ) // If there is no current file is loaded.
+    {
+        bufferToFill.clearActiveBufferRegion(); // Clear everyting so there's no noise.
+    }
+    else
+    {
+        projectSource.getNextAudioBlock(bufferToFill); // Fill the next audio block with the appropriate samples.
+    }
 }
 
 void MainComponent::releaseResources()
 {
-    // This will be called when the audio device stops, or when it is being
-    // restarted due to a setting change.
-
-    // For more details, see the help for AudioProcessor::releaseResources()
+    projectSource.releaseResources();
 }
 
 //==============================================================================================================
 void MainComponent::paint (Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (Colours::black);
-
-    // You can add your drawing code here!
+    g.fillAll (Colours::black); // Makes the background black.
 }
 
 void MainComponent::resized()
@@ -137,18 +176,18 @@ void MainComponent::resized()
     open.setBounds(openArea);
     
     // Sets the region for the play file button.
-    Rectangle<int> playArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*1/10);
+    Rectangle<int> playArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*4/15);
     playArea.setPosition(openArea.getBottomLeft());
     play.setBounds(playArea);
     
     // Sets the region for the pause file button.
-    Rectangle<int> pauseArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*1/10);
+    Rectangle<int> pauseArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*4/15);
     pauseArea.setPosition(playArea.getBottomLeft());
     pause.setBounds(pauseArea);
     
     
     // Sets the region for the stop file button.
-    Rectangle<int> stopArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*1/10);
+    Rectangle<int> stopArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*4/15);
     stopArea.setPosition(pauseArea.getBottomLeft());
     stop.setBounds(stopArea);
 }
