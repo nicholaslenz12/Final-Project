@@ -77,15 +77,21 @@ private:
     /**
      Implements how the app reacts to changes caused by pressing the play, pause, and
         stop buttons.
+     @param newState : The new state of moving through the audio file.
      */
     void changeState(playState newState);
-    //////////////////////////////
+    
+    /**
+     Implements how the app will react when the stop button is pressed.
+     @param button : The button that will be reacted to by a change in its state.
+     */
     void buttonClicked(Button* button) override;
 
     /**
      This function allows the project to actually "listen" for button press and react to
         them. Also, since this function has been defined to the derived class MainComponent,
         MainComponent will not be abstract.
+     @param source : The source of the change that will invoke a response.
      */
     void changeListenerCallback (ChangeBroadcaster* source) override;
     

@@ -13,7 +13,7 @@
 MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1), sampleFreq(44100)
 {
     // Sets the size of the application.
-    setSize (600, 400);
+    setSize (800, 600);
 
     // Specifies the number of input and output channels that we want to open.
     setAudioChannels (2, 2);
@@ -57,9 +57,9 @@ MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1)
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&transportProgress);
     transportProgress.setRange(0, 100);
-    transportProgress.setTextValueSuffix("%");
+    transportProgress.setTextValueSuffix(" %");
     transportProgress.setNumDecimalPlacesToDisplay(1);
-    transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 60, 25);
+    transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 60);
     startTimer(333); // 3 frames per second corresponds to ~333.3 or 333 milliseconds.
     
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
