@@ -11,10 +11,10 @@
 #include "SpectralViewComponent.h"
 
 //==============================================================================================================
-MainComponent::MainComponent() : state(Stopped),
-                                 projectTime(0.0),
-                                 fileLength(1),
-                                 sampleFreq(44100)
+MainComponent::MainComponent() :    state(Stopped),
+                                    projectTime(0.0),
+                                    fileLength(1),
+                                    sampleFreq(44100)
 
 {
     // Sets the size of the application.
@@ -55,18 +55,19 @@ MainComponent::MainComponent() : state(Stopped),
     play.onClick  = [this] { playClicked(); };
     pause.onClick = [this] { pauseClicked(); };
     stop.onClick  = [this] { stopClicked(); };
-    
     stop.addListener(this);
     
     // Makes the spectrum analyzer and the audio progress bar visable.
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&transportProgress);
+    
+    // Customizes the display of the audio progress bar to display the percent through the audio file
     transportProgress.setRange(0, 100);
     transportProgress.setTextValueSuffix(" %");
     transportProgress.setNumDecimalPlacesToDisplay(1);
     transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 60);
-    startTimer(100);
     
+    startTimer(100); // Starts the internal timing for the project. Corresponds to 1000/100 = 10 frames/second.
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
     projectSource.addChangeListener(this); // Adds a listener for button presses.
     
