@@ -63,7 +63,7 @@ MainComponent::MainComponent() :    state(Stopped),
     addAndMakeVisible(&volumeBox);
     
     // Sets the color of the volume box.
-    volumeBox.setColour(Label::backgroundColourId, Colours::white);
+    volumeBox.setColour(Label::backgroundColourId, Colours::floralwhite);
     volumeBox.setColour(Label::textColourId, Colours::black);
     volumeBox.setText("0.0", dontSendNotification);
     volumeBox.setJustificationType(juce::Justification::centred);
@@ -77,7 +77,7 @@ MainComponent::MainComponent() :    state(Stopped),
     transportProgress.setColour(juce::Slider::backgroundColourId, Colours::black);
     transportProgress.setColour(juce::Slider::trackColourId, Colour(255,212,22));
     transportProgress.setColour(juce::Slider::thumbColourId, Colour(255,212,22));
-    transportProgress.setColour(juce::Slider::textBoxBackgroundColourId, Colours::white);
+    transportProgress.setColour(juce::Slider::textBoxBackgroundColourId, Colours::floralwhite);
     transportProgress.setColour(juce::Slider::textBoxTextColourId, Colours::black);
     
     // Customizes the style and range of the rotary dial.

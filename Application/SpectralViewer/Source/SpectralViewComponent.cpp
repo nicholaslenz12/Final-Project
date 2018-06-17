@@ -82,7 +82,9 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
                          // see ResearchDSP.txt for a longer discussion.
     double step = static_cast<double>(componentWidth)/(orderFFT-1); // Width of each octave.
     
-    for( unsigned i = 0; i < orderFFT - 1; ++i ) // For each octave
+    std::cout << samplesForTransform[1] << "\n";
+    
+    for( unsigned i = 0; i < (orderFFT-1); ++i ) // For each octave
     {
         if( i > 0 )
         {
@@ -95,9 +97,18 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
         
         for( unsigned j = halfLogScale; j < logscale; ++j) // For all the frequencies from the FFT in the octave.
         {
-            sum = sum + samplesForTransform[j]; // Sum them.
+            sum = sum + samplesForTransform[j + 1]; // Sum them.
         }
-        float average = sum/halfLogScale; // Then average them together.
+        
+        float average;
+        if( i > 0 )
+        {
+            average = sum/halfLogScale; // Then average them together.
+        }
+        else
+        {
+            average = sum;
+        }
         
         // Sets the height of each band (octave), scaled so that higher frequencies appear louder.
         int height =  logscale * average * componentHeight;

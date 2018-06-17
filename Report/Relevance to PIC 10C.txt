@@ -60,9 +60,9 @@ of receiving audio blocks or else the application will overload/crash/produce er
 -> I ran into the issue of my project not reacting to button presses (the audio was unchanged, but they
 were being toggled). The issue was that I need to inherit from the CallbackListener class, and I then
 had to define the virtual function changeCallbackListener so that my mainComponent could be instantiated.
--> I seem to have a habit of forgetting to break out of switch.
--> I discover that my first major bug was a missing lambda function, which means that whenever the play
-button was pressed the signal was never sent to start the audio.
+-> I seem to have a habit of forgetting to break out of a switch block.
+-> I discovered that my first major bug was a missing lambda function, which means that whenever the
+play button was pressed the signal was never sent to start the audio.
 -> I had issues getting the sliders to give values that gave a reasonable number of significant digits.
 The sliders by default seem to give about 10 digits of precision, which is far too many if I just want
 to display through progress through a file.
@@ -75,8 +75,13 @@ would be very useful to use when debugging the FFT step of my application. I mig
 tones (one frequency) and see if the FFT draws a signal that is roughly like a single peak. I may have
 to look into windowing, which is a process where a signal is "tapered" (or faded) at both ends which
 results in a smoother representation of the signal
--> For some reason the samples seem to be normalized to 100 rather than 1, so as debugging a single tone
-for a while I realized I should be dividing each sample by 100 to normalize it.
+-> For some reason the samples seem to be normalized to 100 rather than 1; I realized this after debugging
+a single tone for some time.So, I divided each sample by 100 to normalize the buffer.
+-> Since the buffer seems to be on average 512 samples long, the GUI could potential re-update at a
+frequency of 44100/512 = 86.13 times per second. However, I manually set it to re-update at 10 
+frames per second. However, the redrawing function is slow, so the graphics are jagged and laggy. I may
+consider interpolating between successive volume levels on each graphic calculation, so this effect is
+mitigated.
 
 
 
