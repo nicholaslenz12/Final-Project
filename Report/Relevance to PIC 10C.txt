@@ -19,16 +19,19 @@ My Struggle (with JUCE):
 
 Preliminaries:
 All timing within the application is done in terms of the sample rate, which I will default to 44100 Hz
-because there is usually very little need to go above that point. Programs created with JUCE are also
-multi-threaded, i.e. one thread is used for the GUI of the application and the other is used for the
-audio processing. Thanks to Stephanie I know that one thread will need to be locked when I try to send
-signals between the two or else I could mis-process the audio signal. By this I mean that the audio
-thread will probably need to be locked when I make changes when using the GUI or else changes in the
-GUI will be interpreted as instantaneous changes in the audio signal which will cause pops and clicks
-(I learned about this phenomenon in Mark Finke's blog post "Making Audio Plugins Part 4: VST and AU
-Targets" on creating an audio plug-in, see my "Useful links" for the link). 
+because there is usually very little need to go above that point (although I notice later that JUCE
+defaults to 44100 Hz automatically). Programs created with JUCE are also multi-threaded, i.e. one thread
+is used for the GUI of the application and the other is used for the audio processing. Thanks to
+Stephanie I know that one thread will need to be locked when I try to send signals between the two or
+else I could mis-process the audio signal. By this I mean that the audio thread will probably need to
+be locked when I make changes when using the GUI or else changes in the GUI will be interpreted as
+instantaneous changes in the audio signal which will cause pops and clicks (I learned about this
+phenomenon in Mark Finke's blog post "Making Audio Plugins Part 4: VST and AU Targets" on creating an
+audio plug-in, see my "Useful links" for the link). 
 
 While Coding:
+
+Graphics:
 -> Organizing the component windows in JUCE is very unintuitive. The removeFromTop and similar member
 functions of the Rectangle class not only remove the area of the window that is requested, but also
 slide the Rectangle in the direction of the removed area. After some finagling I managed to get the
@@ -44,9 +47,10 @@ more tedious because the every button needs to be placed in terms of the "Local 
 it's parent component. The nice thing at the end of this entire process is that the application can be
 resized if the user so chooses, just by dragging the bottom corner. I did discover that I can turn off
 resizing if this becomes an issue later.
+-> Drawing graphics in JUCE will always draw relative to the upper right corner (which is in contrast
+to when adding to component, which are added at the center), which is slightly confusing.
 
-
-
+Coding (Leaks, Linker Errors, Undefined Behavior, etc.)
 -> I ran into several memory leaks once I tried to select files to play from my file browser. The
 problem was that I had to specify what the known filetypes to the app were, before I could select any
 given file.
@@ -66,8 +70,13 @@ to display through progress through a file.
 only reset it when I'm currently playing). I suspect it has to do with my lack of understanding how the
 changeListenerCallback function works. I fixed this issue by creating a specific reaction for pressing
 the stop button.
--> Drawing graphics in JUCE will always draw relative to the upper right corner (which is in contrast
-to when adding to component, which are added at the center), which is slightly confusing.
+-> It's difficult to access and look at the data that is being processed in each audio block, which
+would be very useful to use when debugging the FFT step of my application. I might just put in single
+tones (one frequency) and see if the FFT draws a signal that is roughly like a single peak. I may have
+to look into windowing, which is a process where a signal is "tapered" (or faded) at both ends which
+results in a smoother representation of the signal
+-> For some reason the samples seem to be normalized to 100 rather than 1, so as debugging a single tone
+for a while I realized I should be dividing each sample by 100 to normalize it.
 
 
 

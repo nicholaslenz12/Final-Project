@@ -42,9 +42,21 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
     remember to normalize the values to be between -1 to 1. */
     dsp::FFT frequncyFFT(order - 1);
     frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
-    std::for_each(samplesForTransform, samplesForTransform + halfSize, [maxBufferSize](float x)
-                                                                       { log(x / maxBufferSize); });
-    
+    std::for_each(samplesForTransform, samplesForTransform + halfSize,
+    [](float x) -> float
+    {
+        x = x/100;
+        std::cout << x << " ";
+        return x;
+
+    });
+    std::cout << "\n";
+                  
+//    for( auto i = 0; i < halfSize; ++i )
+//    {
+//        std::cout << samplesForTransform[i] << " ";
+//    }
+//    std::cout << "\n";
     
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Comment >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     
