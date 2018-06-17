@@ -11,7 +11,11 @@
 #include "SpectralViewComponent.h"
 
 //==============================================================================================================
-MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1), sampleFreq(44100)
+MainComponent::MainComponent() : state(Stopped),
+                                 projectTime(0.0),
+                                 fileLength(1),
+                                 sampleFreq(44100)
+
 {
     // Sets the size of the application.
     setSize (800, 600);
@@ -61,7 +65,7 @@ MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1)
     transportProgress.setTextValueSuffix(" %");
     transportProgress.setNumDecimalPlacesToDisplay(1);
     transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 60);
-    startTimer(333); // 3 frames per second corresponds to ~333.3 or 333 milliseconds.
+    startTimer(100);
     
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
     projectSource.addChangeListener(this); // Adds a listener for button presses.
@@ -200,20 +204,29 @@ void MainComponent::timerCallback()
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
     projectSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    buffer = new float[samplesPerBlockExpected] {0};
+    buffer = new float[samplesPerBlockExpected];
 }
 
-void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
+void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& filledBuffer)
 {
     if( !(fileSource.get()) ) // If there is no current file loaded.
     {
-        bufferToFill.clearActiveBufferRegion(); // Clear everything so there's no noise.
+        filledBuffer.clearActiveBufferRegion(); // Clear everything so there's no noise.
     }
     else
     {
-        projectSource.getNextAudioBlock(bufferToFill); // Fill the next audio block with the appropriate samples.
-        spectrum.createPeaks(buffer, bufferToFill.numSamples);
+        projectSource.getNextAudioBlock(filledBuffer); // Fill the next audio block with the appropriate samples.
     }
+    
+    auto* bufferPtr = filledBuffer.buffer->getReadPointer(0, filledBuffer.startSample);
+    int bufferSize = filledBuffer.numSamples;
+
+    for( auto i = 0; i < bufferSize; ++i )
+    {
+        buffer[i] = bufferPtr[i];
+    }
+    spectrum.createPeaks(buffer, filledBuffer.numSamples);
+
 }
 
 void MainComponent::releaseResources()

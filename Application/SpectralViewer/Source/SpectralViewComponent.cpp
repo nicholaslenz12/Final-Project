@@ -14,11 +14,11 @@
 const unsigned SpectralViewComponent::lowerLimit = 20;
 const unsigned SpectralViewComponent::upperLimit = 20560;
 
-SpectralViewComponent::SpectralViewComponent() : graphicsLocked(false)
+SpectralViewComponent::SpectralViewComponent() : graphicsLocked(true)
 {
     setSize(400, 300);
-    height = getHeight();
-    width  = getWidth();
+    componentHeight = getHeight();
+    componentWidth  = getWidth();
 }
 
 SpectralViewComponent::~SpectralViewComponent() {}
@@ -38,15 +38,31 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
     std::copy(bufferToFill, bufferToFill + bufferSize, samplesForTransform);
     
     /* Then we apply the transform so that we map into the frequency vs. volume/amplitude domain. We need to
-    construct the FFT object with half the size of smallest array of size 2^n that fits the buffer We need to
+    construct the FFT object with half the size of smallest array of size 2^n that fits the buffer. We need to
     remember to normalize the values to be between -1 to 1. */
     dsp::FFT frequncyFFT(order - 1);
     frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
     std::for_each(samplesForTransform, samplesForTransform + halfSize, [maxBufferSize](float x)
                                                                        { log(x / maxBufferSize); });
-    for( unsigned i = 0; i < 5; ++i )
+    
+    
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Comment >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
+    double xCoord = 0;
+    double step = 4*static_cast<double>(componentWidth)/halfSize;
+    for( unsigned i = 0; i < halfSize/4; ++i )
     {
+        int height = samplesForTransform[2*i] * componentHeight;
+
+        Rectangle<float> r;
+        if( step >= 0 && height >= 0 )
+        {
+            r.setSize(step, height);
+            r.setPosition(xCoord, componentHeight - height);
+            peaks.push_back(r);
+        }
         
+        xCoord += step;
     }
     
     graphicsLocked = false;
@@ -58,20 +74,23 @@ void SpectralViewComponent::paint (Graphics& g)
     g.fillAll(Colours::floralwhite); // Sets the color of the background to a nice color I found.
     
     // Draws "octave" lines, doesn't need to be locked because won't be redrawn on a buffer change.
-    for( int i = 0; i < 9; ++i )
-    {
-        unsigned x = (i+1)*width/10;
-        g.drawLine(x,0,x,height);
-    }
+//    for( int i = 0; i < 9; ++i )
+//    {
+//        unsigned x = (i+1)*componentWidth/10;
+//        g.drawLine(x,0,x,componentWidth);
+//    }
     if( !graphicsLocked )
     {
-        
+        for( auto rect : peaks )
+        {
+            g.drawRect(rect);
+        }
     }
 }
 
 void SpectralViewComponent::resized()
 {
     repaint();
-    height = getHeight();
-    width  = getWidth();
+    componentHeight = getHeight();
+    componentWidth  = getWidth();
 }

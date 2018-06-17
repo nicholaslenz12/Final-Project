@@ -37,10 +37,10 @@ public:
     
 private:
     //==========================================================================================================
-    std::vector<Rectangle<double>> peaks;
+    std::vector<Rectangle<float>> peaks;
     bool graphicsLocked;
-    unsigned height; // Height of graphic component in pixels.
-    unsigned width; // Height of graphic component in pixels.
+    unsigned componentHeight; // Height of graphic component in pixels.
+    unsigned componentWidth; // Height of graphic component in pixels.
 
 
     
