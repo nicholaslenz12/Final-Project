@@ -7,7 +7,8 @@
   ==============================================================================================================
 */
 
-#pragma once
+#ifndef SpectralViewComponent_h
+#define SpectralViewComponent_h
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <vector>
@@ -22,10 +23,12 @@ class SpectralViewComponent    : public Component
 {
 public:
     static const unsigned lowerLimit; // Corresponds to 20 Hz, the lower end of human hearing.
-    static const unsigned upperLimit; // Corresponds to 20560 Hz, the upper end of human hearing.
+    static const unsigned upperLimit; // Corresponds to 20560 Hz, just above the upper end of human hearing.
     
     SpectralViewComponent();
     ~SpectralViewComponent();
+    
+    void createPeaks(double* bufferToFill, int bufferSize);
 
     void paint (Graphics&) override;
     void resized() override;
@@ -33,12 +36,14 @@ public:
     
 private:
     //==========================================================================================================
-    //std::vector<Line<double>> grid;
+    std::vector<Rectangle<double>> peaks;
     bool graphicsLocked;
-    unsigned height; // Height of graphich component in pixels.
-    unsigned width; // Height of graphich component in pixels.
+    unsigned height; // Height of graphic component in pixels.
+    unsigned width; // Height of graphic component in pixels.
 
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectralViewComponent)
 };
+
+#endif

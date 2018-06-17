@@ -7,7 +7,8 @@
    ==============================================================================================================
  */
 
-#pragma once
+#ifndef MainComponent_h
+#define MainComponent_h
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SpectralViewComponent.h"
@@ -108,7 +109,7 @@ private:
     TextButton play;    // Object so that I can play the selected file.
     TextButton pause;   // Object so that I can pause the selected file.
     TextButton stop;    // Object so that I can stop the selected file.
-    
+        
     SpectralViewComponent spectrum; // Component that holds the functionality of the spectrum-viewer.
     Slider transportProgress; // Object that shows how far through the audio file we are.
     
@@ -118,12 +119,14 @@ private:
     AudioTransportSource projectSource; // Corresponds to the file loaded into the project and its timing
                                         // Within the project.
     playState state;                    // State of viewer: Playing, Starting, Stopping, Stopped, or Paused.
-    double projectTime;                 // Current time at the source file.
-    double fileLength;                  // Length of the project in seconds.
-    double sampleFreq;                  // Sample rate of the selected file.
     
+    double  projectTime;                // Current time at the source file.
+    double  fileLength;                 // Length of the project in seconds.
+    double  sampleFreq;                 // Sample rate of the selected file.
+    double* buffer;         // Will be used to point to an array storing samples.
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
     
-    
 };
+
+#endif

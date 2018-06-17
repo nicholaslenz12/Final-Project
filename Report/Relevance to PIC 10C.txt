@@ -66,6 +66,8 @@ to display through progress through a file.
 only reset it when I'm currently playing). I suspect it has to do with my lack of understanding how the
 changeListenerCallback function works. I fixed this issue by creating a specific reaction for pressing
 the stop button.
+-> Drawing graphics in JUCE will always draw relative to the upper right corner (which is in contrast
+to when adding to component, which are added at the center), which is slightly confusing.
 
 
 

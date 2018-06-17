@@ -19,25 +19,36 @@ SpectralViewComponent::SpectralViewComponent() : graphicsLocked(false)
     setSize(400, 300);
     height = getHeight();
     width  = getWidth();
-    //grid.resize(10);
+    peaks.resize(10);
 }
 
-SpectralViewComponent::~SpectralViewComponent()
+SpectralViewComponent::~SpectralViewComponent() {}
+
+void SpectralViewComponent::createPeaks(double* bufferToFill, int bufferSize)
 {
+    graphicsLocked = true;
+    /* The goal is to fit our buffer into a bin to which we can apply an FFT transform. In order to do so,
+    we must create a bin with 2^n elements, if the buffer is too small, we just put the samples we have in. */
+    int fftSize  = juce::nextPowerOfTwo(bufferSize);
+    int order    = log2(fftSize);
+    int halfSize = fftSize/2;
+    
 }
 
 void SpectralViewComponent::paint (Graphics& g)
 {
-    g.fillAll(Colour(255,154,22)); // Sets the color of the background to a nice color I found.
+    g.fillAll(Colours::floralwhite); // Sets the color of the background to a nice color I found.
+    
+    // Draws octave lines, doesn't need to be locked because won't be redrawn on a buffer change
+    for( int i = 0; i < 9; ++i )
+    {
+        unsigned x = (i+1)*width/10;
+        g.drawLine(x,0,x,height);
+    }
     if( !graphicsLocked )
     {
-        for( int i = 0; i < 9; ++i )
-        {
-            unsigned x = (i+1)*width/10;
-            g.drawLine(x,0,x,height);
-        }
+        
     }
-    //g.drawLine(50,0,50,getBottom());
 }
 
 void SpectralViewComponent::resized()

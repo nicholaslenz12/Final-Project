@@ -8,6 +8,7 @@
 */
 
 #include "MainComponent.h"
+#include "SpectralViewComponent.h"
 
 //==============================================================================================================
 MainComponent::MainComponent() : state(Stopped), projectTime(0.0), fileLength(1), sampleFreq(44100)
@@ -124,7 +125,6 @@ void MainComponent::stopClicked()
 
 void MainComponent::changeState(playState newState)
 {
-    
     if(state != newState)
     {
         state = newState;
@@ -200,17 +200,19 @@ void MainComponent::timerCallback()
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
     projectSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    buffer = new double[samplesPerBlockExpected] {0};
 }
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
-    if( !(fileSource.get()) ) // If there is no current file is loaded.
+    if( !(fileSource.get()) ) // If there is no current file loaded.
     {
-        bufferToFill.clearActiveBufferRegion(); // Clear everyting so there's no noise.
+        bufferToFill.clearActiveBufferRegion(); // Clear everything so there's no noise.
     }
     else
     {
         projectSource.getNextAudioBlock(bufferToFill); // Fill the next audio block with the appropriate samples.
+        //spectrum.createPeaks(buffer, bufferToFill.numSamples);
     }
 }
 
@@ -223,6 +225,7 @@ void MainComponent::releaseResources()
 void MainComponent::paint (Graphics& g)
 {
     g.fillAll (Colours::black); // Makes the background black.
+    spectrum.repaint();
 }
 
 void MainComponent::resized()
@@ -259,6 +262,7 @@ void MainComponent::resized()
     Rectangle<int> progressBarArea(getLocalBounds().getWidth()*9/10,getLocalBounds().getHeight()*1/10);
     progressBarArea.setPosition(stopArea.getBottomLeft());
     transportProgress.setBounds(progressBarArea);
+    
 }
 
 
