@@ -200,7 +200,7 @@ void MainComponent::timerCallback()
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
     projectSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    buffer = new double[samplesPerBlockExpected] {0};
+    buffer = new float[samplesPerBlockExpected] {0};
 }
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
@@ -212,7 +212,7 @@ void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFil
     else
     {
         projectSource.getNextAudioBlock(bufferToFill); // Fill the next audio block with the appropriate samples.
-        //spectrum.createPeaks(buffer, bufferToFill.numSamples);
+        spectrum.createPeaks(buffer, bufferToFill.numSamples);
     }
 }
 

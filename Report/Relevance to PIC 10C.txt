@@ -87,4 +87,7 @@ on the specific named values. The JUCE framework sometimes enumerates private va
 with the classes more intuitive.
 -> I accidentally messed up a git merge which resulted me in looking some time, luckily I was able to
 clone from the remote repository and copy in the files to the point where I just was.
+-> Applying the discrete fast Fourier transform was the perfect location to use some generic algorithms
+and lambda functions, because each audio block (array) needs to be copied to another array and normalized.
+The ability to create lambda functions inline makes the process very easy.
 

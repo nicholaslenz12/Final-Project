@@ -19,7 +19,8 @@
 //==============================================================================================================
 /*
 */
-class SpectralViewComponent    : public Component
+class SpectralViewComponent     : public Component
+
 {
 public:
     static const unsigned lowerLimit; // Corresponds to 20 Hz, the lower end of human hearing.
@@ -28,7 +29,7 @@ public:
     SpectralViewComponent();
     ~SpectralViewComponent();
     
-    void createPeaks(double* bufferToFill, int bufferSize);
+    void createPeaks(float* bufferToFill, int bufferSize);
 
     void paint (Graphics&) override;
     void resized() override;
@@ -40,6 +41,7 @@ private:
     bool graphicsLocked;
     unsigned height; // Height of graphic component in pixels.
     unsigned width; // Height of graphic component in pixels.
+
 
     
     
