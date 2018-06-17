@@ -112,6 +112,7 @@ private:
         
     SpectralViewComponent spectrum; // Component that holds the functionality of the spectrum-viewer.
     Slider transportProgress; // Object that shows how far through the audio file we are.
+    Label volumeBox;          // Textbox to change the gain (volume) of the signal.
     
     
     AudioFormatManager filetypeManager; // Manages the file type (.mp3, .wav, ...).

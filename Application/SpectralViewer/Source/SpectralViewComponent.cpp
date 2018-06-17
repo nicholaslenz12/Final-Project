@@ -21,14 +21,34 @@ SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
     setSize(400, 300);
     componentHeight = getHeight();
     componentWidth  = getWidth();
+    
+    addAndMakeVisible(&minusSixDecibels);
+    addAndMakeVisible(&minusTwelveDecibels);
+    addAndMakeVisible(&minusEighteenDecibels);
+    addAndMakeVisible(&minusTwentyFourDecibels);
+    
+    minusSixDecibels.setText("-6", dontSendNotification);
+    minusSixDecibels.setColour(Label::textColourId, Colours::black);
+    minusSixDecibels.setJustificationType(Justification::right);
+    minusTwelveDecibels.setText("-12", dontSendNotification);
+    minusTwelveDecibels.setColour(Label::textColourId, Colours::black);
+    minusTwelveDecibels.setJustificationType(Justification::right);
+    minusEighteenDecibels.setText("-18", dontSendNotification);
+    minusEighteenDecibels.setColour(Label::textColourId, Colours::black);
+    minusTwentyFourDecibels.setText("-24", dontSendNotification);
+    minusTwentyFourDecibels.setColour(Label::textColourId, Colours::black);
+
+    
+    
 }
 
 SpectralViewComponent::~SpectralViewComponent() {}
 
 void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
 {
-    graphicsLocked = true;
-    peaks.clear();
+    graphicsLocked = true; // Locks the graphics.
+    peaks.clear(); // Clears peaks to be refilled.
+    
     /* The goal is to fit our buffer into a array to which we can apply an FFT transform. In order to do so,
     we must create a array with 2^n elements, if the buffer is too small, we just put the samples we have in. */
     int maxBufferSize  = juce::nextPowerOfTwo(bufferSize);
@@ -46,6 +66,7 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
     (size - i)th index. */
     dsp::FFT frequncyFFT(orderFFT - 1);
     frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
+    
 //    std::for_each(samplesForTransform, samplesForTransform + halfSize,
 //    [](float x) -> float
 //    {
@@ -56,18 +77,32 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
         samplesForTransform[i] = samplesForTransform[i]/100;
     }
     
-    double xCoord   = 0;
-    int    logscale = 1;
-    double step = static_cast<double>(componentWidth)/(orderFFT-1);
+    double xCoord   = 0; // x coordinate for the left-most point of each octave, will be incremented.
+    int    logscale = 1; // Used to scale the frequency spectrum, effectively squashing upper frequencies,
+                         // see ResearchDSP.txt for a longer discussion.
+    double step = static_cast<double>(componentWidth)/(orderFFT-1); // Width of each octave.
     
-    for( unsigned i = 0; i < orderFFT - 1; ++i )
+    for( unsigned i = 0; i < orderFFT - 1; ++i ) // For each octave
     {
         if( i > 0 )
         {
-            logscale *= 2;
+            logscale *= 2; // Makes it so the current octave has twice the # of frequencies as the previous.
         }
-        int height = samplesForTransform[logscale] * componentHeight;
+        
+        // Initilize variables.
+        int halfLogScale = logscale/2;
+        float sum = 0;
+        
+        for( unsigned j = halfLogScale; j < logscale; ++j) // For all the frequencies from the FFT in the octave.
+        {
+            sum = sum + samplesForTransform[j]; // Sum them.
+        }
+        float average = sum/halfLogScale; // Then average them together.
+        
+        // Sets the height of each band (octave), scaled so that higher frequencies appear louder.
+        int height =  logscale * average * componentHeight;
 
+        // Creates and fills the appropriate rectangle with height as computed previously.
         Rectangle<float> r;
         if( step >= 0 && height >= 0 )
         {
@@ -76,10 +111,10 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
             peaks.push_back(r);
         }
         
-        xCoord += step;
+        xCoord += step; // Increments so the next ocave is drawn to the right of the previous.
     }
     
-    graphicsLocked = false;
+    graphicsLocked = false; // Allows the graphics to be redrawn.
     
 }
 
@@ -104,9 +139,9 @@ void SpectralViewComponent::paint (Graphics& g)
     }
     
     
-    if( !graphicsLocked )
+    if( !graphicsLocked ) // If the graphics are not locked (not computing FFT and creating peaks).
     {
-        for( auto rect : peaks )
+        for( auto rect : peaks ) // Loops through the container, drawing and coloring each rectangle.
         {
             g.drawRect(rect);
             g.fillRect(rect);
@@ -116,7 +151,28 @@ void SpectralViewComponent::paint (Graphics& g)
 
 void SpectralViewComponent::resized()
 {
+    
+    Rectangle<int> sixArea(getWidth()/20, getHeight()/30);
+    sixArea.setPosition(getWidth()*19/20, getHeight()/2);
+    minusSixDecibels.setBounds(sixArea);
+    
+    Rectangle<int> twelveArea(getWidth()/20, getHeight()/30);
+    twelveArea.setPosition(getWidth()*19/20, getHeight()*3/4);
+    minusTwelveDecibels.setBounds(twelveArea);
+    
+    Rectangle<int> eighteenArea(getWidth()/20, getHeight()/30);
+    eighteenArea.setPosition(getWidth()*19/20, getHeight()*7/8);
+    minusEighteenDecibels.setBounds(eighteenArea);
+    
+    Rectangle<int> twentyFourArea(getWidth()/20, getHeight()/30);
+    twentyFourArea.setPosition(getWidth()*19/20, getHeight()*15/16);
+    minusTwentyFourDecibels.setBounds(twentyFourArea);
+    
+    
     repaint();
-    componentHeight = getHeight();
+    componentHeight = getHeight(); 
     componentWidth  = getWidth();
+    
+    
+    
 }

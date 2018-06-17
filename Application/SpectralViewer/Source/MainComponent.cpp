@@ -31,9 +31,9 @@ MainComponent::MainComponent() :    state(Stopped),
     
     // Sets what all the text buttons say.
     open.setButtonText("---> Open a File <---");
-    play.setButtonText("Play");
-    pause.setButtonText("Pause");
-    stop.setButtonText("Stop");
+//    play.setButtonText("Play");
+//    pause.setButtonText("Pause");
+//    stop.setButtonText("Stop");
     
     // Disable all the buttons at the start.
     play.setEnabled(false);
@@ -57,15 +57,30 @@ MainComponent::MainComponent() :    state(Stopped),
     stop.onClick  = [this] { stopClicked(); };
     stop.addListener(this);
     
-    // Makes the spectrum analyzer and the audio progress bar visable.
+    // Makes the spectrum analyzer and sliders visible.
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&transportProgress);
+    addAndMakeVisible(&volumeBox);
     
-    // Customizes the display of the audio progress bar to display the percent through the audio file
+    // Sets the color of the volume box.
+    volumeBox.setColour(Label::backgroundColourId, Colours::white);
+    volumeBox.setColour(Label::textColourId, Colours::black);
+    volumeBox.setText("0.0", dontSendNotification);
+    volumeBox.setJustificationType(juce::Justification::centred);
+    
+    
+    // Customizes the display of the audio progress bar to display the percent through the audio file.
     transportProgress.setRange(0, 100);
     transportProgress.setTextValueSuffix(" %");
     transportProgress.setNumDecimalPlacesToDisplay(1);
     transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 60);
+    transportProgress.setColour(juce::Slider::backgroundColourId, Colours::black);
+    transportProgress.setColour(juce::Slider::trackColourId, Colour(255,212,22));
+    transportProgress.setColour(juce::Slider::thumbColourId, Colour(255,212,22));
+    transportProgress.setColour(juce::Slider::textBoxBackgroundColourId, Colours::white);
+    transportProgress.setColour(juce::Slider::textBoxTextColourId, Colours::black);
+    
+    // Customizes the style and range of the rotary dial.
     
     startTimer(100); // Starts the internal timing for the project. Corresponds to 1000/100 = 10 frames/second.
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
@@ -247,35 +262,41 @@ void MainComponent::resized()
     Rectangle<int> applicationArea = getLocalBounds(); // Total area of the GUI.
     
     // Sets the region for the open file button.
-    Rectangle<int> openArea(getLocalBounds().getWidth(),getLocalBounds().getHeight()*1/10);
+    Rectangle<int> openArea(getWidth(),getHeight()*1/10);
     openArea.setTop(getLocalBounds().getY());
     openArea.setLeft(getLocalBounds().getX());
     open.setBounds(openArea);
     
     // Sets the region for the play file button.
-    Rectangle<int> playArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*4/15);
+    Rectangle<int> playArea(getWidth()*1/10,getHeight()*4/15);
     playArea.setPosition(openArea.getBottomLeft());
     play.setBounds(playArea);
     
     // Sets the region for the pause file button.
-    Rectangle<int> pauseArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*4/15);
+    Rectangle<int> pauseArea(getWidth()*1/10,getHeight()*4/15);
     pauseArea.setPosition(playArea.getBottomLeft());
     pause.setBounds(pauseArea);
     
     // Sets the region for the stop file button.
-    Rectangle<int> stopArea(getLocalBounds().getWidth()*1/10,getLocalBounds().getHeight()*4/15);
+    Rectangle<int> stopArea(getWidth()*1/10,getHeight()*4/15);
     stopArea.setPosition(pauseArea.getBottomLeft());
     stop.setBounds(stopArea);
     
     // Sets the region for the spectral view.
-    Rectangle<int> spectrumArea(getLocalBounds().getWidth()*4/5,getLocalBounds().getHeight()*4/5);
+    Rectangle<int> spectrumArea(getWidth()*4/5,getHeight()*4/5);
     spectrumArea.setCentre(getLocalBounds().getCentre());
     spectrum.setBounds(spectrumArea);
     
     // Sets the region for the progess bar.
-    Rectangle<int> progressBarArea(getLocalBounds().getWidth()*9/10,getLocalBounds().getHeight()*1/10);
+    Rectangle<int> progressBarArea(getWidth()*9/10,getHeight()*1/10);
     progressBarArea.setPosition(stopArea.getBottomLeft());
     transportProgress.setBounds(progressBarArea);
+    
+    // Sets the region for the volume adjustment box.
+    Rectangle<int> textArea(getWidth()*1/10,getHeight()*1/10);
+    textArea.setPosition(spectrumArea.getBottomRight());
+    volumeBox.setBounds(textArea);
+
     
 }
 

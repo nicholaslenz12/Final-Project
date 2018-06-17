@@ -46,6 +46,13 @@ public:
     
 private:
     //==========================================================================================================
+    Label minusSixDecibels;
+    Label minusTwelveDecibels;
+    Label minusEighteenDecibels;
+    Label minusTwentyFourDecibels;
+    
+    
+    
     std::vector<Rectangle<float>> peaks; // Stores the rectangles that form the spectrum display.
     bool graphicsLocked; // Bool that returns false if the FFT routine is running.
     unsigned componentHeight; // Height of graphic component in pixels.
