@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SpectralViewComponent.h"
+#include "MeterComponent.h"
 
 /*
     This component lives inside our window, and this is where you should put all
@@ -111,6 +112,7 @@ private:
     TextButton stop;    // Object so that I can stop the selected file.
         
     SpectralViewComponent spectrum; // Component that holds the functionality of the spectrum-viewer.
+    MeterComponent meter; // Component that holds the functionality of the volume meter.
     Slider transportProgress; // Object that shows how far through the audio file we are.
     Label volumeBox;          // Textbox to change the gain (volume) of the signal.
     

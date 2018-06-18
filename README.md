@@ -4,7 +4,7 @@ This repository contains the source files I used to create my application, a rep
 * The application is a cross-platform audio spectrum analyzer. It has the following features:
     * Loads in common audio file types (.mp3, .wav, etc.) for playback.
     * Has a transport bar displaying the position in the audio file.
-    * Shows nine octaves.
+    * Shows eight octaves.
     
 * I made this project using the JUCE framework, which specializes in creating audio applications for use in music.
 

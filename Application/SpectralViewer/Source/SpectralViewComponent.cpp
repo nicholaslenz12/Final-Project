@@ -15,12 +15,12 @@ const unsigned SpectralViewComponent::lowerLimit = 20;
 const unsigned SpectralViewComponent::upperLimit = 20560;
 
 SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
-                                                    orderFFT(9)
+                                                    orderFFT(9),
+                                                    componentWidth(getWidth()),
+                                                    componentHeight(getHeight())
 
 {
     setSize(400, 300);
-    componentHeight = getHeight();
-    componentWidth  = getWidth();
     
     addAndMakeVisible(&minusSixDecibels);
     addAndMakeVisible(&minusTwelveDecibels);
@@ -35,8 +35,11 @@ SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
     minusTwelveDecibels.setJustificationType(Justification::right);
     minusEighteenDecibels.setText("-18", dontSendNotification);
     minusEighteenDecibels.setColour(Label::textColourId, Colours::black);
+    minusEighteenDecibels.setJustificationType(Justification::right);
     minusTwentyFourDecibels.setText("-24", dontSendNotification);
     minusTwentyFourDecibels.setColour(Label::textColourId, Colours::black);
+    minusTwentyFourDecibels.setJustificationType(Justification::right);
+
 
     
     
@@ -72,6 +75,7 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
 //    {
 //        return x/100;
 //    });
+    
     for( auto i = 0; i < halfSize; ++i )
     {
         samplesForTransform[i] = samplesForTransform[i]/100;
@@ -81,8 +85,6 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
     int    logscale = 1; // Used to scale the frequency spectrum, effectively squashing upper frequencies,
                          // see ResearchDSP.txt for a longer discussion.
     double step = static_cast<double>(componentWidth)/(orderFFT-1); // Width of each octave.
-    
-    std::cout << samplesForTransform[1] << "\n";
     
     for( unsigned i = 0; i < (orderFFT-1); ++i ) // For each octave
     {
@@ -110,16 +112,27 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
             average = sum;
         }
         
+        if( average > 1 ) // If the average is greater than 1, set to 1 so can fit in the spectrum.
+        {
+            average = 1;
+        }
+
         // Sets the height of each band (octave), scaled so that higher frequencies appear louder.
-        int height =  logscale * average * componentHeight;
+        int height =  (4.0/6)*logscale * average * componentHeight;
+        
+        if( height > componentHeight )  // Resets if height is too large (doesn't happen that frequently though).
+        {
+            height = componentHeight;
+        }
+        
 
         // Creates and fills the appropriate rectangle with height as computed previously.
-        Rectangle<float> r;
+        Rectangle<float> rect;
         if( step >= 0 && height >= 0 )
         {
-            r.setSize(step, height);
-            r.setPosition(xCoord, componentHeight - height);
-            peaks.push_back(r);
+            rect.setSize(step, height);
+            rect.setPosition(xCoord, componentHeight - height);
+            peaks.push_back(rect);
         }
         
         xCoord += step; // Increments so the next ocave is drawn to the right of the previous.
@@ -132,7 +145,6 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
 void SpectralViewComponent::paint (Graphics& g)
 {
     g.fillAll(Colours::floralwhite); // Sets the color of the background to a nice color I found.
-    
     g.setColour(Colours::grey);
     
     //Draws "octave" lines, doesn't need to be locked because won't be redrawn on a buffer change.
@@ -143,7 +155,7 @@ void SpectralViewComponent::paint (Graphics& g)
     }
     
     //Draws volume lines, each line corresponds to 6 decibels lower than the line above it.
-    for( int i = 1; i < 6; ++i )
+    for( int i = 1; i < 5; ++i )
     {
         unsigned lineHeight = componentHeight - componentHeight/(exp2(i));
         g.drawLine(0, lineHeight, componentWidth, lineHeight);
