@@ -15,6 +15,8 @@ MainComponent::MainComponent() :    state(Stopped),
                                     projectTime(0.0),
                                     fileLength(1.0),
                                     sampleFreq(44100),
+                                    buffer(nullptr),
+                                    bufferSize(512),
                                     wasPaused(true)
 
 {
@@ -235,6 +237,12 @@ void MainComponent::timerCallback()
         projectTime = projectSource.getCurrentPosition();
         transportProgress.setValue(100*projectTime/fileLength);
     }
+    
+    if( buffer )
+    {
+        meter.createPeak(buffer, bufferSize);
+        spectrum.createPeaks(buffer, bufferSize);
+    }
 }
 
 
@@ -264,8 +272,6 @@ void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& filledBuffe
     {
         buffer[i] = bufferPtr[i];
     }
-    meter.createPeak(buffer, bufferSize);
-    spectrum.createPeaks(buffer, bufferSize);
 }
 
 void MainComponent::releaseResources()

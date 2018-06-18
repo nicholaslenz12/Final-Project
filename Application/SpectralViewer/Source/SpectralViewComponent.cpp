@@ -130,6 +130,9 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
         
             xCoord += step; // Increments so the next ocave is drawn to the right of the previous.
         }
+        
+        delete[] samplesForTransform;
+        samplesForTransform = nullptr;
     
         graphicsLocked = false; // Allows the graphics to be redrawn.
     }

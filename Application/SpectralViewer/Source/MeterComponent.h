@@ -15,8 +15,8 @@
 //==============================================================================================================
 /*
 */
-class MeterComponent    :   public Component,
-                            public Timer
+class MeterComponent    :   public Component
+
 {
 public:
     MeterComponent();
@@ -27,8 +27,6 @@ public:
     float computeRMS(float* buffer, int bufferSize);
     
     void setRMS(float oldRMS);
-
-    void timerCallback() override;
     
     void paint (Graphics&) override;
     void resized() override;

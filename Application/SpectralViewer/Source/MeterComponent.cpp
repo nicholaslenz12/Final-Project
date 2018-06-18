@@ -27,8 +27,6 @@ MeterComponent::MeterComponent() :
     volumeBox.setColour(Label::textColourId, Colours::black);
     volumeBox.setText("0.0 dBFS", dontSendNotification);
     volumeBox.setJustificationType(juce::Justification::centred);
-    
-    startTimer(100);
 }
 
 MeterComponent::~MeterComponent() {}
@@ -77,10 +75,7 @@ void MeterComponent::paint (Graphics& g)
         g.drawRect(peak);
         g.fillRect(peak);
     }
-}
-
-void MeterComponent::timerCallback()
-{
+    
     if( RMS > 0.000001 )
     {
         volumeBox.setText(std::to_string(6*log2(RMS)) + " dBFS", dontSendNotification);
@@ -89,8 +84,8 @@ void MeterComponent::timerCallback()
     {
         volumeBox.setText("-inf\ndBFS", dontSendNotification);
     }
+    
 }
-
 
 void MeterComponent::resized()
 {
