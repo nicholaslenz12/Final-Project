@@ -20,8 +20,6 @@ SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
                                                     componentHeight(getHeight())
 
 {
-    setSize(400, 300);
-    
     addAndMakeVisible(&minusSixDecibels);
     addAndMakeVisible(&minusTwelveDecibels);
     addAndMakeVisible(&minusEighteenDecibels);
@@ -39,9 +37,6 @@ SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
     minusTwentyFourDecibels.setText("-24", dontSendNotification);
     minusTwentyFourDecibels.setColour(Label::textColourId, Colours::black);
     minusTwentyFourDecibels.setJustificationType(Justification::right);
-
-
-    
     
 }
 
@@ -69,12 +64,6 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
     (size - i)th index. */
     dsp::FFT frequncyFFT(orderFFT - 1);
     frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
-    
-//    std::for_each(samplesForTransform, samplesForTransform + halfSize,
-//    [](float x) -> float
-//    {
-//        return x/100;
-//    });
     
     for( auto i = 0; i < halfSize; ++i )
     {
@@ -145,23 +134,8 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
 void SpectralViewComponent::paint (Graphics& g)
 {
     g.fillAll(Colours::floralwhite); // Sets the color of the background to a nice color I found.
-    g.setColour(Colours::grey);
     
-    //Draws "octave" lines, doesn't need to be locked because won't be redrawn on a buffer change.
-    for( int i = 0; i < orderFFT - 1 ; ++i )
-    {
-        unsigned x = (i+1)*componentWidth/(orderFFT - 1);
-        g.drawLine(x,0,x,componentWidth);
-    }
-    
-    //Draws volume lines, each line corresponds to 6 decibels lower than the line above it.
-    for( int i = 1; i < 5; ++i )
-    {
-        unsigned lineHeight = componentHeight - componentHeight/(exp2(i));
-        g.drawLine(0, lineHeight, componentWidth, lineHeight);
-    }
-    
-    
+    g.setColour(Colours::lime);
     if( !graphicsLocked ) // If the graphics are not locked (not computing FFT and creating peaks).
     {
         for( auto rect : peaks ) // Loops through the container, drawing and coloring each rectangle.
@@ -170,6 +144,21 @@ void SpectralViewComponent::paint (Graphics& g)
             g.fillRect(rect);
         }
     }
+    
+    g.setColour(Colours::grey);
+    //Draws "octave" lines, doesn't need to be locked because won't be redrawn on a buffer change.
+    for( int i = 0; i < orderFFT - 1 ; ++i )
+    {
+        unsigned x = (i+1)*componentWidth/(orderFFT - 1);
+        g.drawLine(x,0,x,componentWidth);
+    }
+    //Draws volume lines, each line corresponds to 6 decibels lower than the line above it.
+    for( int i = 1; i < 5; ++i )
+    {
+        unsigned lineHeight = componentHeight - componentHeight/(exp2(i));
+        g.drawLine(0, lineHeight, componentWidth, lineHeight);
+    }
+    
 }
 
 void SpectralViewComponent::resized()

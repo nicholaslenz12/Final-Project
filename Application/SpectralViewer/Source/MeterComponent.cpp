@@ -13,9 +13,10 @@
 
 //==============================================================================
 MeterComponent::MeterComponent() :
+                                    graphicsLocked(true),
                                     componentWidth(getWidth()),
-                                    componentHeight(getHeight()),
-                                    graphicsLocked(true)
+                                    componentHeight(getHeight())
+
 {
     
 }
@@ -27,7 +28,7 @@ void MeterComponent::createPeak(float* buffer, int bufferSize)
     graphicsLocked = true;
     float height = computeRMS(buffer, bufferSize) * componentHeight;
     peak.setSize(componentWidth, height);
-    peak.setPosition(0, componentHeight-height);
+    peak.setPosition(0, componentHeight - height);
     graphicsLocked = false;
 }
 
@@ -44,6 +45,14 @@ float MeterComponent::computeRMS(float* buffer, int bufferSize)
 void MeterComponent::paint (Graphics& g)
 {
     g.fillAll(Colours::floralwhite);
+    g.setColour(Colours::grey);
+    
+    for( int i = 1; i < 5; ++i )
+    {
+        unsigned lineHeight = componentHeight - componentHeight/(exp2(i));
+        g.drawLine(0, lineHeight, componentWidth, lineHeight);
+    }
+    
     g.setColour(Colours::red);
     
     if( !graphicsLocked )
@@ -55,7 +64,6 @@ void MeterComponent::paint (Graphics& g)
 
 void MeterComponent::resized()
 {
-    
     repaint();
     componentHeight = getHeight();
     componentWidth  = getWidth();

@@ -127,6 +127,7 @@ private:
     double fileLength;                  // Length of the project in seconds.
     double sampleFreq;                  // Sample rate of the selected file.
     float* buffer;                      // Will be used to point to an array storing samples.
+    int    bufferSize;                  // Size of the buffer.
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
     

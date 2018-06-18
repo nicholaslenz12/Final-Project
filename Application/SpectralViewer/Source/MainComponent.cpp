@@ -13,12 +13,12 @@
 //==============================================================================================================
 MainComponent::MainComponent() :    state(Stopped),
                                     projectTime(0.0),
-                                    fileLength(1),
+                                    fileLength(1.0),
                                     sampleFreq(44100)
 
 {
     // Sets the size of the application.
-    setSize (800, 600);
+    setSize (720, 480);
 
     // Specifies the number of input and output channels that we want to open.
     setAudioChannels (2, 2);
@@ -73,8 +73,8 @@ MainComponent::MainComponent() :    state(Stopped),
     // Customizes the display of the audio progress bar to display the percent through the audio file.
     transportProgress.setRange(0, 100);
     transportProgress.setTextValueSuffix(" %");
-    transportProgress.setNumDecimalPlacesToDisplay(1);
-    transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 60);
+    transportProgress.setNumDecimalPlacesToDisplay(0);
+    transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 72, 48);
     transportProgress.setColour(juce::Slider::backgroundColourId, Colours::black);
     transportProgress.setColour(juce::Slider::trackColourId, Colour(255,212,22));
     transportProgress.setColour(juce::Slider::thumbColourId, Colour(255,212,22));
@@ -86,7 +86,6 @@ MainComponent::MainComponent() :    state(Stopped),
     startTimer(100); // Starts the internal timing for the project. Corresponds to 1000/100 = 10 frames/second.
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
     projectSource.addChangeListener(this); // Adds a listener for button presses.
-    
 }
 
 MainComponent::~MainComponent()
@@ -114,11 +113,11 @@ void MainComponent::openClicked()
             projectSource.setSource(selectedFileSource.get(), 0, nullptr, fileReader->sampleRate);
             sampleFreq = fileReader->sampleRate;
             fileLength = (static_cast<double>(fileReader->lengthInSamples)/sampleFreq);
+            
             play.setEnabled(true); // Prepares the play button so that it can play.
             fileSource.reset(selectedFileSource.release());
         }
         open.setButtonText(selectedFile.getFileName());
-        
     }
 }
 
@@ -211,9 +210,7 @@ void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
 void MainComponent::timerCallback()
 {
     projectTime = projectSource.getCurrentPosition();
-    transportProgress.setValue(projectTime);
-    double percentThrough = 100*projectTime/fileLength;
-    transportProgress.setValue(percentThrough);
+    transportProgress.setValue(100*projectTime/fileLength);
 }
 
 
@@ -237,14 +234,14 @@ void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& filledBuffe
     
     // Gets a pointer to the first sample in the first audio channel.
     auto* bufferPtr = filledBuffer.buffer->getReadPointer(0, filledBuffer.startSample);
-    int bufferSize = filledBuffer.numSamples;
+    bufferSize = filledBuffer.numSamples;
 
     for( auto i = 0; i < bufferSize; ++i )
     {
         buffer[i] = bufferPtr[i];
     }
-    meter.createPeak(buffer, filledBuffer.numSamples);
-    spectrum.createPeaks(buffer, filledBuffer.numSamples);
+    meter.createPeak(buffer, bufferSize);
+    spectrum.createPeaks(buffer, bufferSize);
 
     
 
@@ -260,6 +257,7 @@ void MainComponent::paint (Graphics& g)
 {
     g.fillAll (Colours::black); // Makes the background black.
     spectrum.repaint();
+    meter.repaint();
 }
 
 void MainComponent::resized()
