@@ -15,7 +15,8 @@
 //==============================================================================================================
 /*
 */
-class MeterComponent    : public Component
+class MeterComponent    :   public Component,
+                            public Timer
 {
 public:
     MeterComponent();
@@ -25,13 +26,20 @@ public:
 
     float computeRMS(float* buffer, int bufferSize);
     
+    void setRMS(float oldRMS);
+
+    void timerCallback() override;
+    
     void paint (Graphics&) override;
     void resized() override;
 
 private:
     //==========================================================================================================
-    bool graphicsLocked;
+    Label volumeBox;          // Textbox to change the gain (volume) of the signal.
     Rectangle<float> peak;
+    
+    bool graphicsLocked;
+    float RMS;
     unsigned componentHeight; // Height of graphic component in pixels.
     unsigned componentWidth; // Height of graphic component in pixels.
     

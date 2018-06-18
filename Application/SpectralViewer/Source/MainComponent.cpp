@@ -14,7 +14,8 @@
 MainComponent::MainComponent() :    state(Stopped),
                                     projectTime(0.0),
                                     fileLength(1.0),
-                                    sampleFreq(44100)
+                                    sampleFreq(44100),
+                                    wasPaused(true)
 
 {
     // Sets the size of the application.
@@ -31,9 +32,9 @@ MainComponent::MainComponent() :    state(Stopped),
     
     // Sets what all the text buttons say.
     open.setButtonText("---> Open a File <---");
-//    play.setButtonText("Play");
-//    pause.setButtonText("Pause");
-//    stop.setButtonText("Stop");
+    play.setButtonText("Play");
+    pause.setButtonText("Pause");
+    stop.setButtonText("Stop");
     
     // Disable all the buttons at the start.
     play.setEnabled(false);
@@ -52,36 +53,56 @@ MainComponent::MainComponent() :    state(Stopped),
     
     // Provides the functionality for the buttons, i.e. once they are clicked
     open.onClick  = [this] { openClicked(); };
-    play.onClick  = [this] { playClicked(); };
-    pause.onClick = [this] { pauseClicked(); };
-    stop.onClick  = [this] { stopClicked(); };
+    play.onClick  = [this] { playClicked();  wasPaused = false; };
+    pause.onClick = [this] { pauseClicked(); wasPaused = true;  };
+    stop.onClick  = [this] { stopClicked();  wasPaused = true;  };
+    transportProgress.onDragStart = [this]
+    {
+        pauseClicked();
+    };
+    transportProgress.onDragEnd   = [this]
+    {
+        projectSource.setPosition(transportProgress.getValue()*fileLength/100);
+        if( !wasPaused )
+        {
+            playClicked();
+        }
+    };
     stop.addListener(this);
     
-    // Makes the spectrum analyzer, meter, and sliders visible.
+    
+    // Makes the spectrum analyzer, meter, and slider visible.
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&meter);
     addAndMakeVisible(&transportProgress);
-    addAndMakeVisible(&volumeBox);
-    
-    // Sets the color of the volume box.
-    volumeBox.setColour(Label::backgroundColourId, Colour(255,212,22));
-    volumeBox.setColour(Label::textColourId, Colours::black);
-    volumeBox.setText("0.0", dontSendNotification);
-    volumeBox.setJustificationType(juce::Justification::centred);
-    
+    addAndMakeVisible(&fiftyPer);
+    addAndMakeVisible(&twentyFivePer);
+    addAndMakeVisible(&seventyFivePer);
+
     
     // Customizes the display of the audio progress bar to display the percent through the audio file.
+    transportProgress.setSliderSnapsToMousePosition(true);
     transportProgress.setRange(0, 100);
     transportProgress.setTextValueSuffix(" %");
     transportProgress.setNumDecimalPlacesToDisplay(0);
+    transportProgress.setTextBoxIsEditable(false);
     transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 72, 48);
-    transportProgress.setColour(juce::Slider::backgroundColourId, Colours::black);
+    transportProgress.setColour(juce::Slider::backgroundColourId, Colours::grey);
     transportProgress.setColour(juce::Slider::trackColourId, Colour(255,212,22));
     transportProgress.setColour(juce::Slider::thumbColourId, Colour(255,212,22));
     transportProgress.setColour(juce::Slider::textBoxBackgroundColourId, Colour(255,212,22));
     transportProgress.setColour(juce::Slider::textBoxTextColourId, Colours::black);
     
-    // Customizes the style and range of the rotary dial.
+    // Customizes the transport bar label(s)
+    fiftyPer.setColour(Label::textColourId, Colour(255,212,22));
+    fiftyPer.setText("50", dontSendNotification);
+    fiftyPer.setJustificationType(Justification::centred);
+    twentyFivePer.setColour(Label::textColourId, Colour(255,212,22));
+    twentyFivePer.setText("25", dontSendNotification);
+    twentyFivePer.setJustificationType(Justification::left);
+    seventyFivePer.setColour(Label::textColourId, Colour(255,212    ,22));
+    seventyFivePer.setText("75", dontSendNotification);
+    seventyFivePer.setJustificationType(Justification::right);
     
     startTimer(100); // Starts the internal timing for the project. Corresponds to 1000/100 = 10 frames/second.
     filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
@@ -209,8 +230,11 @@ void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
 
 void MainComponent::timerCallback()
 {
-    projectTime = projectSource.getCurrentPosition();
-    transportProgress.setValue(100*projectTime/fileLength);
+    if( !(transportProgress.isMouseButtonDown()) )
+    {
+        projectTime = projectSource.getCurrentPosition();
+        transportProgress.setValue(100*projectTime/fileLength);
+    }
 }
 
 
@@ -242,9 +266,6 @@ void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& filledBuffe
     }
     meter.createPeak(buffer, bufferSize);
     spectrum.createPeaks(buffer, bufferSize);
-
-    
-
 }
 
 void MainComponent::releaseResources()
@@ -291,7 +312,7 @@ void MainComponent::resized()
     spectrum.setBounds(spectrumArea);
     
     // Sets the region for the meter.
-    Rectangle<int> meterArea(getWidth()/10, getHeight()*4/5);
+    Rectangle<int> meterArea(getWidth()/10, getHeight()*9/10);
     meterArea.setPosition(spectrumArea.getTopRight());
     meter.setBounds(meterArea);
     
@@ -300,11 +321,20 @@ void MainComponent::resized()
     progressBarArea.setPosition(stopArea.getBottomLeft());
     transportProgress.setBounds(progressBarArea);
     
-    // Sets the region for the volume adjustment box.
-    Rectangle<int> textArea(getWidth()/10,getHeight()/10);
-    textArea.setPosition(spectrumArea.getBottomRight());
-    volumeBox.setBounds(textArea);
+    // Sets the region for the 50% marker.
+    Rectangle<int> fiftyArea(getWidth()/20,getHeight()/20);
+    fiftyArea.setCentre(getWidth()/2,getHeight()*69/70);
+    fiftyPer.setBounds(fiftyArea);
+    
+    // Sets the region for the 25% marker.
+    Rectangle<int> twentyFiveArea(getWidth()/20,getHeight()/20);
+    twentyFiveArea.setCentre(getWidth()*5/16,getHeight()*69/70);
+    twentyFivePer.setBounds(twentyFiveArea);
 
+    // Sets the region for the 75% marker.
+    Rectangle<int> seventyFiveArea(getWidth()/20,getHeight()/20);
+    seventyFiveArea.setCentre(getWidth()*11/16,getHeight()*69/70);
+    seventyFivePer.setBounds(seventyFiveArea);
     
 }
 

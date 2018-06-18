@@ -110,12 +110,14 @@ private:
     TextButton play;    // Object so that I can play the selected file.
     TextButton pause;   // Object so that I can pause the selected file.
     TextButton stop;    // Object so that I can stop the selected file.
+    
+    Label fiftyPer;         // Marks 50% through the audio file.
+    Label twentyFivePer;    // Marks 25% through the audio file.
+    Label seventyFivePer;   // Marks 75% through the audio file.
         
     SpectralViewComponent spectrum; // Component that holds the functionality of the spectrum-viewer.
     MeterComponent meter; // Component that holds the functionality of the volume meter.
-    Slider transportProgress; // Object that shows how far through the audio file we are.
-    Label volumeBox;          // Textbox to change the gain (volume) of the signal.
-    
+    Slider transportProgress; // Object that shows how far through the audio file we are.    
     
     AudioFormatManager filetypeManager; // Manages the file type (.mp3, .wav, ...).
     std::unique_ptr<AudioFormatReaderSource> fileSource; // Points to source properties of the file.
@@ -128,6 +130,8 @@ private:
     double sampleFreq;                  // Sample rate of the selected file.
     float* buffer;                      // Will be used to point to an array storing samples.
     int    bufferSize;                  // Size of the buffer.
+    
+    bool   wasPaused;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
     
