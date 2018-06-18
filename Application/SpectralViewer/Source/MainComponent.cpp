@@ -53,11 +53,19 @@ MainComponent::MainComponent() :    state(Stopped),
     stop.setColour(TextButton::buttonColourId, Colours::red);
     stop.setColour(TextButton::textColourOffId, Colours::black);
     
-    // Provides the functionality for the buttons, i.e. once they are clicked
+    /*
+       Provides the functionality for the buttons, i.e. once they are clicked
+       their appropriate functions are called using a lambda function.
+       open, play, and stop have been adapted from JUCE's tutorial "Build an
+       audio player".
+    */
     open.onClick  = [this] { openClicked(); };
     play.onClick  = [this] { playClicked();  wasPaused = false; };
     pause.onClick = [this] { pauseClicked(); wasPaused = true;  };
     stop.onClick  = [this] { stopClicked();  wasPaused = true;  };
+    stop.addListener(this); // Allows the stop button to react to mouse clicks.
+    
+    // Allows the transport bar to be moved, without clicks in the audio.
     transportProgress.onDragStart = [this]
     {
         pauseClicked();
@@ -70,10 +78,10 @@ MainComponent::MainComponent() :    state(Stopped),
             playClicked();
         }
     };
-    stop.addListener(this);
+
     
     
-    // Makes the spectrum analyzer, meter, and slider visible.
+    // Makes the spectrum analyzer, meter, and slider (with marks) visible on the GUI.
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&meter);
     addAndMakeVisible(&transportProgress);
@@ -82,12 +90,18 @@ MainComponent::MainComponent() :    state(Stopped),
     addAndMakeVisible(&seventyFivePer);
 
     
-    // Customizes the display of the audio progress bar to display the percent through the audio file.
-    transportProgress.setSliderSnapsToMousePosition(true);
+
+
+    // Sets the transport bar so it displays percent through the audio file.
     transportProgress.setRange(0, 100);
     transportProgress.setTextValueSuffix(" %");
     transportProgress.setNumDecimalPlacesToDisplay(0);
+    
+    // Prevents/enables so functionality of the transport/slider bar.
     transportProgress.setTextBoxIsEditable(false);
+    transportProgress.setSliderSnapsToMousePosition(true);
+
+    // Customizes the display of the audio progress bar.
     transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 72, 48);
     transportProgress.setColour(juce::Slider::backgroundColourId, Colours::darkgrey);
     transportProgress.setColour(juce::Slider::trackColourId, Colour(255,212,22));
@@ -113,14 +127,15 @@ MainComponent::MainComponent() :    state(Stopped),
 
 MainComponent::~MainComponent()
 {
-    // This shuts down the audio device and clears the audio source.
-    shutdownAudio();
+    delete[] buffer; // Dealloacates the memory the buffer stored audio in.
+    buffer = nullptr; // Sets buffer to nullptr.
+    shutdownAudio(); // This shuts down the audio device and clears the audio source.
 }
 
 //==============================================================================================================
 void MainComponent::openClicked()
 {
-    FileChooser findFile("Select an audio file to play.", File::nonexistent, "");
+    FileChooser findFile("Select an audio file to play.", File::nonexistent, ""); // Creates a file chooser object.
     
     if( findFile.browseForFileToOpen() ) // If the native file browser opens and the user opens a file.
                                           
@@ -140,64 +155,76 @@ void MainComponent::openClicked()
             play.setEnabled(true); // Prepares the play button so that it can play.
             fileSource.reset(selectedFileSource.release());
         }
-        open.setButtonText(selectedFile.getFileName());
+        open.setButtonText(selectedFile.getFileName()); // Displays the filename.
     }
 }
 
 void MainComponent::playClicked()
 {
     pause.setToggleState(false, NotificationType::dontSendNotification);
-    stop.setToggleState(false, NotificationType::dontSendNotification);
-    changeState(Starting);
+    changeState(Starting); // Calls changeState() to begin playback. Needs changeCallbackListener() to be
+                           // implemented and listening to function.
 }
 
 void MainComponent::pauseClicked()
 {
 
     pause.setToggleState(true, NotificationType::dontSendNotification);
-    stop.setToggleState(false, NotificationType::dontSendNotification);
-    changeState(Pausing);
+    changeState(Pausing); // Calls changeState() to begin pausing. Needs changeCallbackListener() to be
+                          // implemented and listening to function.
 }
 
 void MainComponent::stopClicked()
 {
     pause.setToggleState(false, NotificationType::dontSendNotification);
-    stop.setToggleState(true, NotificationType::dontSendNotification);
-    changeState(Stopping);
+    changeState(Stopping); // Calls changeState() to begin stopping. Needs changeCallbackListener() to be
+                           // implemented and listening to function.
 }
 
+/*
+    Most of this function is given in JUCE's tutorial. I added the cases Paused and Pausing so my app can pause.
+    Paused's implementation is virtually identical to Stopped except it doesn't reset the position to zero.
+    Pausing and Stopping are differentiated by pause's toggle state.
+*/
 void MainComponent::changeState(playState newState)
 {
-    if(state != newState)
+    if(state != newState) // If the new state of the app is different, after being called back a source change
+                          // causing a callback.
     {
-        state = newState;
+        state = newState; // We set the new state.
         
         switch(state)
         {
             case Paused:
+                // Disable/enable buttons so that play/pause/stop can't be pressed twice in a row avoiding
+                // redundancy/allowing the user to see the current state.
                 stop.setEnabled(true);
                 pause.setEnabled(false);
                 play.setEnabled(true);
                 break;
             case Stopped:
+                // Disable/enable buttons so that play/pause/stop can't be pressed twice in a row avoiding
+                // redundancy/allowing the user to see the current state.
                 stop.setEnabled(false);
                 pause.setEnabled(false);
                 play.setEnabled(true);
-                projectSource.setPosition(0.0);
+                projectSource.setPosition(0.0); // Sets the transport position to the start of the audio file.
                 break;
             case Starting:
                 play.setEnabled(false);
-                projectSource.start();
+                projectSource.start(); // Activates the source callback.
                 break;
             case Playing:
                 stop.setEnabled(true);
                 pause.setEnabled(true);
                 break;
             case Pausing:
-                projectSource.stop();
+                projectSource.stop(); // Stops the app from playing back audio. Pausing is differentiated from
+                                      // stopping during the callback where the toggle state of pause is determined.
                 break;
             case Stopping:
-                projectSource.stop();
+                projectSource.stop(); // Stops the app from playing back audio. pause is not toggled so, the
+                                      // audio is reset to zero.
                 break;
         }
     }
@@ -205,25 +232,28 @@ void MainComponent::changeState(playState newState)
 
 void MainComponent::buttonClicked(Button* button)
 {
-    if( button == &stop )
+    if( button == &stop )     // If stop was the button that was clicked.
     {
-        changeState(Stopped);
+        changeState(Stopped); // Stops the audio.
     }
 }
 
 void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
 {
-    if( source == &projectSource ) // If the source of the callback is the project's source audio file.
+    if( source == &projectSource )      // If the source of the callback is the app's source audio file.
     {
-        if( projectSource.isPlaying() ) // Checks to see if the project is playing.
+        if( projectSource.isPlaying() ) // Checks to see if the app is playing.
         {
-            changeState(Playing); // If so changes the state to playing.
+            changeState(Playing);       // If so changes the state to playing.
         }
-        else if( pause.getToggleState() )
+        
+        // If the app is not playing then it is stopped. If paused was toggled, then it should be paused,
+        // else it should be stopped.
+        else if( pause.getToggleState() ) // If pause was toggled.
         {
             changeState(Paused);
         }
-        else
+        else // If pause was not toggle.
         {
             changeState(Stopped);
         }
@@ -232,13 +262,14 @@ void MainComponent::changeListenerCallback (ChangeBroadcaster* source)
 
 void MainComponent::timerCallback()
 {
-    if( !(transportProgress.isMouseButtonDown()) )
+    if( !(transportProgress.isMouseButtonDown()) ) // If the transport is being dragged, don't update the percent
+                                                   // of the way through the audio file.
     {
         projectTime = projectSource.getCurrentPosition();
         transportProgress.setValue(100*projectTime/fileLength);
     }
     
-    if( buffer )
+    if( buffer ) // If the audio buffer has been filled with samples, calls the functions that draw the graphics.
     {
         meter.createPeak(buffer, bufferSize);
         spectrum.createPeaks(buffer, bufferSize);
@@ -250,7 +281,7 @@ void MainComponent::timerCallback()
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
     projectSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    buffer = new float[samplesPerBlockExpected];
+    buffer = new float[samplesPerBlockExpected]; // Allocates space for the samples to be obtained from the buffer.
 }
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& filledBuffer)
@@ -268,7 +299,7 @@ void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& filledBuffe
     auto* bufferPtr = filledBuffer.buffer->getReadPointer(0, filledBuffer.startSample);
     bufferSize = filledBuffer.numSamples;
 
-    for( auto i = 0; i < bufferSize; ++i )
+    for( auto i = 0; i < bufferSize; ++i ) // Fills buffer with each sample in the buffer filled by the fileSource.
     {
         buffer[i] = bufferPtr[i];
     }
@@ -283,14 +314,12 @@ void MainComponent::releaseResources()
 void MainComponent::paint (Graphics& g)
 {
     g.fillAll (Colours::black); // Makes the background black.
-    spectrum.repaint();
-    meter.repaint();
+    spectrum.repaint();         // Refreshes the graphics for the spectrum.
+    meter.repaint();            // Refreshes the graphics for the meter.
 }
 
 void MainComponent::resized()
 {
-    Rectangle<int> applicationArea = getLocalBounds(); // Total area of the GUI.
-    
     // Sets the region for the open file button.
     Rectangle<int> openArea(getWidth(), getHeight()/10);
     openArea.setTop(getLocalBounds().getY());
@@ -341,7 +370,6 @@ void MainComponent::resized()
     Rectangle<int> seventyFiveArea(getWidth()/20,getHeight()/20);
     seventyFiveArea.setCentre(getWidth()*11/16,getHeight()*69/70);
     seventyFivePer.setBounds(seventyFiveArea);
-    
 }
 
 
