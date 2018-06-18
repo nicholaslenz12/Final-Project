@@ -87,7 +87,7 @@ MainComponent::MainComponent() :    state(Stopped),
     transportProgress.setNumDecimalPlacesToDisplay(0);
     transportProgress.setTextBoxIsEditable(false);
     transportProgress.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 72, 48);
-    transportProgress.setColour(juce::Slider::backgroundColourId, Colours::grey);
+    transportProgress.setColour(juce::Slider::backgroundColourId, Colours::darkgrey);
     transportProgress.setColour(juce::Slider::trackColourId, Colour(255,212,22));
     transportProgress.setColour(juce::Slider::thumbColourId, Colour(255,212,22));
     transportProgress.setColour(juce::Slider::textBoxBackgroundColourId, Colour(255,212,22));

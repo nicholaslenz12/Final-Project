@@ -25,16 +25,16 @@ SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
     addAndMakeVisible(&minusEighteenDecibels);
     addAndMakeVisible(&minusTwentyFourDecibels);
     
-    minusSixDecibels.setText("-6", dontSendNotification);
+    minusSixDecibels.setText("-6 dBFS", dontSendNotification);
     minusSixDecibels.setColour(Label::textColourId, Colours::black);
     minusSixDecibels.setJustificationType(Justification::right);
-    minusTwelveDecibels.setText("-12", dontSendNotification);
+    minusTwelveDecibels.setText("-12 dBFS", dontSendNotification);
     minusTwelveDecibels.setColour(Label::textColourId, Colours::black);
     minusTwelveDecibels.setJustificationType(Justification::right);
-    minusEighteenDecibels.setText("-18", dontSendNotification);
+    minusEighteenDecibels.setText("-18 dBFS", dontSendNotification);
     minusEighteenDecibels.setColour(Label::textColourId, Colours::black);
     minusEighteenDecibels.setJustificationType(Justification::right);
-    minusTwentyFourDecibels.setText("-24", dontSendNotification);
+    minusTwentyFourDecibels.setText("-24 dBFS", dontSendNotification);
     minusTwentyFourDecibels.setColour(Label::textColourId, Colours::black);
     minusTwentyFourDecibels.setJustificationType(Justification::right);
     
@@ -44,91 +44,95 @@ SpectralViewComponent::~SpectralViewComponent() {}
 
 void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
 {
-    graphicsLocked = true; // Locks the graphics.
-    peaks.clear(); // Clears peaks to be refilled.
-    
-    /* The goal is to fit our buffer into a array to which we can apply an FFT transform. In order to do so,
-    we must create a array with 2^n elements, if the buffer is too small, we just put the samples we have in. */
-    int maxBufferSize  = juce::nextPowerOfTwo(bufferSize);
-    int orderFFT       = log2(maxBufferSize);
-    int halfSize       = maxBufferSize/2;
-    
-    // Copies the elements from the audio buffer and puts it into an array of size 2^n, for some n.
-    float* samplesForTransform = new float[maxBufferSize];
-    std::copy(bufferToFill, bufferToFill + bufferSize, samplesForTransform);
-    
-    /* Then we apply the transform so that we map into the frequency vs. volume/amplitude domain. We construct
-    the FFT object with half the size of smallest array of size 2^n that fits the buffer. We need to remember
-    to normalize the values to be between -1 to 1. You can also note that we only care about the first half of
-    the array, because the FFT returns a "symmetric" array, i.e. one where the ith index is equal to the
-    (size - i)th index. */
-    dsp::FFT frequncyFFT(orderFFT - 1);
-    frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
-    
-    for( auto i = 0; i < halfSize; ++i )
+    if( !isMouseButtonDown() )
     {
-        samplesForTransform[i] = samplesForTransform[i]/100;
-    }
+        graphicsLocked = true; // Locks the graphics.
+        peaks.clear(); // Clears peaks to be refilled.
     
-    double xCoord   = 0; // x coordinate for the left-most point of each octave, will be incremented.
-    int    logscale = 1; // Used to scale the frequency spectrum, effectively squashing upper frequencies,
+        /* The goal is to fit our buffer into a array to which we can apply an FFT transform. In order to do so,
+         we must create a array with 2^n elements, if the buffer is too small, we just put the samples we have in.
+         the reason for 2^n elements is the standard FFT uses a divided and conquer algorithm, which splits the
+         buffer in half successively. */
+        int maxBufferSize  = juce::nextPowerOfTwo(bufferSize);
+        int orderFFT       = log2(maxBufferSize);
+        int halfSize       = maxBufferSize/2;
+    
+        // Copies the elements from the audio buffer and puts it into an array of size 2^n, for some n.
+        float* samplesForTransform = new float[maxBufferSize];
+        std::copy(bufferToFill, bufferToFill + bufferSize, samplesForTransform);
+    
+        /* Then we apply the transform so that we map into the frequency vs. volume/amplitude domain. We construct
+         the FFT object with half the size of smallest array of size 2^n that fits the buffer. We need to remember
+         to normalize the values to be between -1 to 1. You can also note that we only care about the first half of
+         the array, because the FFT returns a "symmetric" array, i.e. one where the ith index is equal to the
+         (size - i)th index. */
+        dsp::FFT frequncyFFT(orderFFT - 1);
+        frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
+    
+        for( auto i = 0; i < halfSize; ++i )
+        {
+            samplesForTransform[i] = samplesForTransform[i]/100;
+        }
+    
+        double xCoord   = 0; // x coordinate for the left-most point of each octave, will be incremented.
+        int    logscale = 1; // Used to scale the frequency spectrum, effectively squashing upper frequencies,
                          // see ResearchDSP.txt for a longer discussion.
-    double step = static_cast<double>(componentWidth)/(orderFFT-1); // Width of each octave.
+        double step = static_cast<double>(componentWidth)/(orderFFT-1); // Width of each octave.
     
-    for( unsigned i = 0; i < (orderFFT-1); ++i ) // For each octave
-    {
-        if( i > 0 )
+        for( unsigned i = 0; i < (orderFFT-1); ++i ) // For each octave
         {
-            logscale *= 2; // Makes it so the current octave has twice the # of frequencies as the previous.
-        }
+            if( i > 0 )
+            {
+                logscale *= 2; // Makes it so the current octave has twice the # of frequencies as the previous.
+            }
         
-        // Initilize variables.
-        int halfLogScale = logscale/2;
-        float sum = 0;
+            // Initilize variables.
+            int halfLogScale = logscale/2;
+            float sum = 0;
         
-        for( unsigned j = halfLogScale; j < logscale; ++j) // For all the frequencies from the FFT in the octave.
-        {
-            sum = sum + samplesForTransform[j + 1]; // Sum them.
-        }
+            for( unsigned j = halfLogScale; j < logscale; ++j) // For all the frequencies from the FFT in the octave.
+            {
+                sum = sum + samplesForTransform[j + 1]; // Sum them.
+            }
         
-        float average;
-        if( i > 0 )
-        {
-            average = sum/halfLogScale; // Then average them together.
-        }
-        else
-        {
-            average = sum;
-        }
+            float average;
+            if( i > 0 )
+            {
+                average = sum/halfLogScale; // Then average them together.
+            }
+            else
+            {
+                average = sum;
+            }
         
-        if( average > 1 ) // If the average is greater than 1, set to 1 so can fit in the spectrum.
-        {
-            average = 1;
-        }
+            if( average > 1 ) // If the average is greater than 1, set to 1 so can fit in the spectrum.
+            {
+                average = 1;
+            }
 
-        // Sets the height of each band (octave), scaled so that higher frequencies appear louder.
-        int height =  (4.0/6)*logscale * average * componentHeight;
+            // Sets the height of each band (octave), scaled so that higher frequencies appear louder.
+            int height =  (4.0/6)*logscale * average * componentHeight;
         
-        if( height > componentHeight )  // Resets if height is too large (doesn't happen that frequently though).
-        {
-            height = componentHeight;
-        }
+            if( height > componentHeight )  // Resets if height is too large (doesn't happen that frequently though).
+            {
+                height = componentHeight;
+            }
         
 
-        // Creates and fills the appropriate rectangle with height as computed previously.
-        Rectangle<float> rect;
-        if( step >= 0 && height >= 0 )
-        {
-            rect.setSize(step, height);
-            rect.setPosition(xCoord, componentHeight - height);
-            peaks.push_back(rect);
-        }
+            // Creates and fills the appropriate rectangle with height as computed previously.
+            Rectangle<float> rect;
+            if( step >= 0 && height >= 0 )
+            {
+                rect.setSize(step, height);
+                rect.setPosition(xCoord, componentHeight - height);
+                peaks.push_back(rect);
+            }
         
-        xCoord += step; // Increments so the next ocave is drawn to the right of the previous.
+            xCoord += step; // Increments so the next ocave is drawn to the right of the previous.
+        }
+    
+        graphicsLocked = false; // Allows the graphics to be redrawn.
     }
-    
-    graphicsLocked = false; // Allows the graphics to be redrawn.
-    
 }
 
 void SpectralViewComponent::paint (Graphics& g)
@@ -164,20 +168,20 @@ void SpectralViewComponent::paint (Graphics& g)
 void SpectralViewComponent::resized()
 {
     
-    Rectangle<int> sixArea(getWidth()/20, getHeight()/30);
-    sixArea.setPosition(getWidth()*19/20, getHeight()/2);
+    Rectangle<int> sixArea(getWidth()/10, getHeight()/30);
+    sixArea.setPosition(getWidth()*18/20, getHeight()/2);
     minusSixDecibels.setBounds(sixArea);
     
-    Rectangle<int> twelveArea(getWidth()/20, getHeight()/30);
-    twelveArea.setPosition(getWidth()*19/20, getHeight()*3/4);
+    Rectangle<int> twelveArea(getWidth()/10, getHeight()/30);
+    twelveArea.setPosition(getWidth()*18/20, getHeight()*3/4);
     minusTwelveDecibels.setBounds(twelveArea);
     
-    Rectangle<int> eighteenArea(getWidth()/20, getHeight()/30);
-    eighteenArea.setPosition(getWidth()*19/20, getHeight()*7/8);
+    Rectangle<int> eighteenArea(getWidth()/10, getHeight()/30);
+    eighteenArea.setPosition(getWidth()*18/20, getHeight()*7/8);
     minusEighteenDecibels.setBounds(eighteenArea);
     
-    Rectangle<int> twentyFourArea(getWidth()/20, getHeight()/30);
-    twentyFourArea.setPosition(getWidth()*19/20, getHeight()*15/16);
+    Rectangle<int> twentyFourArea(getWidth()/10, getHeight()/30);
+    twentyFourArea.setPosition(getWidth()*18/20, getHeight()*15/16);
     minusTwentyFourDecibels.setBounds(twentyFourArea);
     
     
