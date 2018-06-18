@@ -12,7 +12,6 @@
 
 //==============================================================================================================
 MainComponent::MainComponent() :    state(Stopped),
-                                    projectTime(0.0),
                                     fileLength(1.0),
                                     sampleFreq(44100),
                                     buffer(nullptr),
@@ -79,8 +78,6 @@ MainComponent::MainComponent() :    state(Stopped),
         }
     };
 
-    
-    
     // Makes the spectrum analyzer, meter, and slider (with marks) visible on the GUI.
     addAndMakeVisible(&spectrum);
     addAndMakeVisible(&meter);
@@ -88,9 +85,6 @@ MainComponent::MainComponent() :    state(Stopped),
     addAndMakeVisible(&fiftyPer);
     addAndMakeVisible(&twentyFivePer);
     addAndMakeVisible(&seventyFivePer);
-
-    
-
 
     // Sets the transport bar so it displays percent through the audio file.
     transportProgress.setRange(0, 100);
@@ -265,7 +259,7 @@ void MainComponent::timerCallback()
     if( !(transportProgress.isMouseButtonDown()) ) // If the transport is being dragged, don't update the percent
                                                    // of the way through the audio file.
     {
-        projectTime = projectSource.getCurrentPosition();
+        double projectTime = projectSource.getCurrentPosition();
         transportProgress.setValue(100*projectTime/fileLength);
     }
     
@@ -371,5 +365,3 @@ void MainComponent::resized()
     seventyFiveArea.setCentre(getWidth()*11/16,getHeight()*69/70);
     seventyFivePer.setBounds(seventyFiveArea);
 }
-
-

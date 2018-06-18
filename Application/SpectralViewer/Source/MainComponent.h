@@ -126,7 +126,6 @@ private:
                                         // Within the project.
     playState state;                    // State of viewer: Playing, Starting, Stopping, Stopped, or Paused.
     
-    double projectTime;                 // Current time at the source file.
     double fileLength;                  // Length of the project in seconds.
     double sampleFreq;                  // Sample rate of the selected file.
     float* buffer;                      // Will be used to point to an array storing samples.

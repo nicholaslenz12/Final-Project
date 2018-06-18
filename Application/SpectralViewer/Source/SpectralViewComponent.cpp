@@ -51,10 +51,12 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
         graphicsLocked = true; // Locks the graphics.
         peaks.clear(); // Clears peaks to be refilled.
     
-        /* The goal is to fit our buffer into a array to which we can apply an FFT transform. In order to do so,
-         we must create a array with 2^n elements, if the buffer is too small, we just put the samples we have in.
-         the reason for 2^n elements is the standard FFT uses a divided and conquer algorithm, which splits the
-         buffer in half successively. */
+        /*
+            The goal is to fit our buffer into a array to which we can apply an FFT transform. In order to do so,
+            we must create a array with 2^n elements, if the buffer is too small, we just put the samples we
+            have in. the reason for 2^n elements is the standard FFT uses a divided and conquer algorithm, which
+            splits the buffer in half successively.
+        */
         int maxBufferSize  = juce::nextPowerOfTwo(bufferSize);
         int orderFFT       = log2(maxBufferSize);
         int halfSize       = maxBufferSize/2;
@@ -63,11 +65,13 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
         float* samplesForTransform = new float[maxBufferSize];
         std::copy(bufferToFill, bufferToFill + bufferSize, samplesForTransform);
     
-        /* Then we apply the transform so that we map into the frequency vs. volume/amplitude domain. We construct
-         the FFT object with half the size of smallest array of size 2^n that fits the buffer. We need to remember
-         to normalize the values to be between -1 to 1. You can also note that we only care about the first half of
-         the array, because the FFT returns a "symmetric" array, i.e. one where the ith index is equal to the
-         (size - i)th index. */
+        /*
+            Then we apply the transform so that we map into the frequency vs. volume/amplitude domain. We
+            construct the FFT object with half the size of smallest array of size 2^n that fits the buffer. We
+            need to remember to normalize the values to be between -1 to 1. You can also note that we only care
+            about the first half of the array, because the FFT returns a "symmetric" array, i.e. one where the
+            ith index is equal to the (size - i)th index.
+        */
         dsp::FFT frequncyFFT(orderFFT - 1);
         frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
     
@@ -78,7 +82,7 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
     
         double xCoord   = 0; // x coordinate for the left-most point of each octave, will be incremented.
         int    logscale = 1; // Used to scale the frequency spectrum, effectively squashing upper frequencies,
-                         // see ResearchDSP.txt for a longer discussion.
+                             // see ResearchDSP.txt for a longer discussion.
         double step = static_cast<double>(componentWidth)/(orderFFT-1); // Width of each octave.
     
         for( unsigned i = 0; i < (orderFFT-1); ++i ) // For each octave
@@ -129,14 +133,13 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
                 rect.setPosition(xCoord, componentHeight - height);
                 peaks.push_back(rect);
             }
-        
             xCoord += step; // Increments so the next ocave is drawn to the right of the previous.
         }
         
         // Frees up dynamic memory.
         delete[] samplesForTransform;
         samplesForTransform = nullptr;
-    
+
         graphicsLocked = false; // Allows the graphics to be redrawn.
     }
 }

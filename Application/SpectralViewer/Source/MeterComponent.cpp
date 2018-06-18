@@ -13,8 +13,7 @@
 #include <string>
 
 //==============================================================================================================
-MeterComponent::MeterComponent() :
-                                    graphicsLocked(true),
+MeterComponent::MeterComponent() :  graphicsLocked(true),
                                     RMS(0.0),
                                     componentHeight(getHeight()),
                                     componentWidth(getWidth())
@@ -33,9 +32,11 @@ MeterComponent::~MeterComponent() {}
 void MeterComponent::createPeak(float* buffer, int bufferSize)
 {
     graphicsLocked = true;
+    
     float height = computeRMS(buffer, bufferSize) * componentHeight; // Computes the height of the meter.
     peak.setSize(componentWidth, height);              // Sets the size of the meter.
     peak.setPosition(0, componentHeight*8/9 - height); // Sets the position ofhte meter in its parent component.
+    
     graphicsLocked = false;
 }
 
