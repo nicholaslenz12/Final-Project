@@ -63,3 +63,15 @@ of volume. A common transform is the Fourier Transform, however since we are wor
 discrete (not infinite in time) signal we must use the DFT, Discrete Fourier Transform.
 The most common, and most efficient implementation of the DFT is the FFT, Fast Fourier
 Transform, which has time complexity O(nlog(n)).
+
+Part way through the application I needed to approximate the average volume of a signal. Since
+a waveform arises from a potential (voltage) the integral of the signal over a period is zero.
+This is clearly a bad measure of average volume. Instead we look to squaring each signal, to
+remove their sign, averaging them, and then take the root of the average. This is called the RMS
+of the signal, which is a better measure of the overall loudness. 
+
+================================================================================================
+
+All of the information from above comes from a book I read (I've only read the first 24
+chapters), The Scientist and Engineer's Guide to Digital Signal Processing, by Steven W. Smith,
+Ph.D, chapters 3 - 12 and 22.

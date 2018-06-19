@@ -1,17 +1,16 @@
 # Final Project
-This repository contains the source files I used to create my application, a report of my research, and links to websites that I found useful.
+This repository contains the source files I used to create my application, a report of my research, and links to websites that I found useful. Look under the "Report" folder in this repository to find my research on digital signal processing and what I discovered about JUCE/what I used from PIC 10C on this application. The source files are in the "Source" folder.
 
-* The application is a cross-platform audio spectrum analyzer. It has the following features:
-    * Loads in common audio file types (.mp3, .wav, etc.) for playback.
-    * Has a transport bar displaying the position in the audio file.
-    * Shows eight octaves.
-    
-* I made this project using the JUCE framework, which specializes in creating audio applications for use in music.
+* The application is an audio spectrum analyzer. It is made with the a collection of modules, the JUCE framework, that supports basic to complex audio functions. My application hosts these features:
+    * Audio playback in many common audio file types (.wav, .mp3, .aiff, .flac, etc.)
+    * Spectrum display that shows 8 octaves, which can be frozen by clicking on the display.
+    * An RMS meter that shows the gain of the waveform in dBFS.
+    * Play, pause, and stop buttons that smoothly fade in/out audio.
+    * A transport bar to easily select certain sections of a recording.
 
 ## To Compile the Project Yourself
 * The JUCE 5 Library is provided on GitHub, [here](https://github.com/WeAreROLI/JUCE "JUCE 5 Library on GitHub"). Clone the repository to a directory on your file system. The necessary source files that are used to compile my code are in JUCE/modules.
-* Alternatively, go to the JUCE website and download the most current version of JUCE. Contained within ~/JUCE there is application called Projucer. Opening the application will present you with a window with options for creating a project. Choosing the "Audio Application" will begin creating a new application. You may choose an IDE to open the project in (Xcode for OS X, Visual Studio for Windows) and click on the icon in the upper right for the IDE. This will open the project in your IDE of choice. In the "Source" folder of the IDE delete the two auto-generated files and include my source files.
-
+* Alternatively, go to the JUCE website and download the most current version of JUCE (JUCE 5.3). Contained within .../JUCE is an application called Projucer. Opening the application will present you with a window with options for creating a project. Choosing the "Audio Application" will begin creating a new application. In the files tab, under "File Explorer" delete the existing files and right click to "Add Exisiting Files". Add my source files to the Projucer. Then click "Modules" and make sure that the juce_dsp module has been included in the project. If so, you may choose an IDE to open the project in (Xcode for OS X, Visual Studio for Windows) and click on the icon in the upper right to open the IDE. This will open the project in your IDE of choice.
 
 ## Useful links:
 * The Scientist and Engineer's Guide to Digital Signal Processing, by Steven W. Smith, Ph.D. He offers the digital version of his book [here](http://dspguide.com/pdfbook.htm "The Scientist and Engineer's Guide to Digital Signal Processing's Table of Content").
@@ -21,3 +20,4 @@ This repository contains the source files I used to create my application, a rep
 
 ## Here's a picture of my app:
 ![Spectrum Analysis](MyGUI.png)
+And [here](https://drive.google.com/file/d/15JP6mvoeYjkq1Pq9BZY8vbRnD7ocD0UC/view?usp=sharing "Google Drive Movie")'s a link to a video of me using the app.  

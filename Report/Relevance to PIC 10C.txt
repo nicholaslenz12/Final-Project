@@ -18,14 +18,14 @@ My Struggle (with JUCE):
 --> To understand this section you may need to read Research-DSP.txt located in the same directory <--
 
 Preliminaries:
-All timing within the application is done in terms of the sample rate, which I will default to 44100 Hz
-because there is usually very little need to go above that point (although I notice later that JUCE
-defaults to 44100 Hz automatically). Programs created with JUCE are also multi-threaded, i.e. one thread
-is used for the GUI of the application and the other is used for the audio processing. Thanks to
-Stephanie I know that one thread will need to be locked when I try to send signals between the two or
-else I could mis-process the audio signal. By this I mean that the audio thread will probably need to
-be locked when I make changes when using the GUI or else changes in the GUI will be interpreted as
-instantaneous changes in the audio signal which will cause pops and clicks (I learned about this
+Most of the timing within the application is done in terms of the sample rate, which is defaulted to
+44100 Hz by JUCE because there is usually very little need to go above that point (although I notice
+later that JUCE defaults to 44100 Hz automatically). Programs created with JUCE are also multi-threaded,
+i.e. one thread is used for the GUI of the application and the other is used for the audio processing.
+Thanks to Stephanie I know that one thread will need to be locked when I try to send signals between
+the two or else I could mis-process the audio signal. By this I mean that the audio thread will probably
+need to be locked when I make changes when using the GUI or else changes in the GUI will be interpreted
+as instantaneous changes in the audio signal which will cause pops and clicks (I learned about this
 phenomenon in Mark Finke's blog post "Making Audio Plugins Part 4: VST and AU Targets" on creating an
 audio plug-in, see my "Useful links" for the link). 
 
@@ -81,9 +81,7 @@ a single tone for some time.So, I divided each sample by 100 to normalize the bu
 frequency of 44100/512 = 86.13 times per second. However, I manually set it to re-update at 10 
 frames per second. However, the redrawing function is slow, so the graphics are jagged and laggy. I may
 consider interpolating between successive volume levels on each graphic calculation, so this effect is
-mitigated.
-
-
+mitigated. -> Update: After reducing the CPU usage and a leak this is no longer as much of an issue.
 
 =======================================================================================================
 
@@ -104,4 +102,6 @@ clone from the remote repository and copy in the files to the point where I just
 -> Applying the discrete fast Fourier transform was the perfect location to use some generic algorithms
 and lambda functions, because each audio block (array) needs to be copied to another array and normalized.
 The ability to create and use lambda functions inline makes the process very easy.
+-> I had very little use for templates in this application, because most functions that I wrote myself
+only had to be used once, so I didn't need to define them to be generic.
 
