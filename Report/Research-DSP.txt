@@ -14,7 +14,7 @@ magnet induces a potential in the wire. This potential is measured in volts. Sin
 pulsation of the air is periodic in time, the measured voltage is periodic in time too.
 Therefore, it is possible to represent the voltage as a periodic function in time. Some
 knowledge of analysis tells us that we can construct a Fourier series that is equivalent to
-the voltage function (so long as the sound is constant!). Each term in the series corresponds
+the voltage function (so long as the sound is periodic!). Each term in the series corresponds
 to a frequency of human hearing.
 
 However, there is a problem. Computers are digital machines and only have finite precision.
@@ -72,6 +72,6 @@ of the signal, which is a better measure of the overall loudness.
 
 ================================================================================================
 
-All of the information from above comes from a book I read (I've only read the first 24
-chapters), The Scientist and Engineer's Guide to Digital Signal Processing, by Steven W. Smith,
-Ph.D, chapters 3 - 12 and 22.
+All of the information from above comes from a book I read this quarter (I've only read the first
+24 chapters), The Scientist and Engineer's Guide to Digital Signal Processing, by Steven W. Smith,
+Ph.D, chapters 3 - 12 and 22, and from an engineering course I took in high school (paragraph 2).

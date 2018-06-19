@@ -3,10 +3,12 @@ Relevance to PIC 10C:
 =======================================================================================================
 
 Notes on why I chose JUCE over Qt:
-1) First and the most important reason is that JUCE is a framework that was created for the purpose of
+1) The most important reason is that JUCE is a framework that was created for the purpose of
 real-time audio processing, while Qt is for more general development.
-2) I have been looking into JUCE for about (now that I think about it) half a year now so I am slightly
-familiar with how the framework is set up.
+
+2) I have been looking into JUCE for about half a year now so I am slightly familiar with how the
+framework is set up.
+
 3) JUCE's sliders, spin-boxes and other features are similar to Qt's respective features. So, my
 understanding of Qt translates rather well to JUCE. Also, JUCE is similar to Qt in that the buttons,
 sliders, and sub-content windows are all controlled ultimately by the MainContentComponent. This means
