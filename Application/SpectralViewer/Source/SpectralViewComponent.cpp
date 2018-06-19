@@ -74,12 +74,11 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
         */
         dsp::FFT frequncyFFT(orderFFT - 1);
         frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
-    
-        for( unsigned i = 0; i < halfSize; ++i )
-        {
-            samplesForTransform[i] = samplesForTransform[i]/100;
-        }
-    
+        
+        // Normalizes all the frequencies so their maximum volume is 1.
+        std::transform(samplesForTransform, samplesForTransform + halfSize, samplesForTransform,
+                       [](float& x){ return x/100; });
+        
         double xCoord   = 0; // x coordinate for the left-most point of each octave, will be incremented.
         int    logscale = 1; // Used to scale the frequency spectrum, effectively squashing upper frequencies,
                              // see ResearchDSP.txt for a longer discussion.

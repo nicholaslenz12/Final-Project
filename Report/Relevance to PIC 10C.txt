@@ -55,7 +55,7 @@ Coding (Leaks, Linker Errors, Undefined Behavior, etc.)
 problem was that I had to specify what the known filetypes to the app were, before I could select any
 given file.
 -> It appears to be audio processing occurs first at the level of audio blocks, which is a collection
-(of fixed size) of contiguous samples. Audio processing must happen faster than the application's rate
+of (fixed size) contiguous samples. Audio processing must happen faster than the application's rate
 of receiving audio blocks or else the application will overload/crash/produce erroneous output.
 -> I ran into the issue of my project not reacting to button presses (the audio was unchanged, but they
 were being toggled). The issue was that I need to inherit from the CallbackListener class, and I then
@@ -82,6 +82,11 @@ frequency of 44100/512 = 86.13 times per second. However, I manually set it to r
 frames per second. However, the redrawing function is slow, so the graphics are jagged and laggy. I may
 consider interpolating between successive volume levels on each graphic calculation, so this effect is
 mitigated. -> Update: After reducing the CPU usage and a leak this is no longer as much of an issue.
+-> I spend some time trying to use std::for_each to apply an effect to my buffer. After searching around
+I found out that is considered bad practice to use for_each to modify the elements of a container since
+for_each is not supposed to (in general) modify the contents of a container. So, instead I used the 
+std::transform to modify containers. However, I'm still very much in favor of the range-based for loop
+if I have to apply so function to the contents of the entire container.
 
 =======================================================================================================
 
@@ -104,4 +109,34 @@ and lambda functions, because each audio block (array) needs to be copied to ano
 The ability to create and use lambda functions inline makes the process very easy.
 -> I had very little use for templates in this application, because most functions that I wrote myself
 only had to be used once, so I didn't need to define them to be generic.
+
+=======================================================================================================
+
+End Notes (for now...):
+How I came up with the idea:
+I used another piece of software that does essentially the same thing as my app called Voxengo Span. The
+app awed me with its graphics and how useful its display was. However, I felt the look of it was quite
+dated and some times the GUI is a lot to take in. So, I thought it would be interesting if I could create
+a similar application. Also, the GUI for a spectrum analyzer is able to work based on a well known
+algorithm called the FFT. Since I've been studying complex analysis recently I thought it would be cool
+to try to apply my knowledge to understanding the FFT routine.
+
+What I hoped for:
+If you look back at my early commits, you'll see on my README that my goal was to create a musical spectrum
+analyzer with several difficult "octave views", i.e., splitting up a musical octave into partitions of
+thirds, eighths, and sixteenths. This was a more difficult task than I expected because I didn't anticipate
+the massive number of data points I would need per buffer to achieve the necessary resolution. Since my
+application uses a buffer of 512 samples, my spectral resolution is the Nyquist frequency, 22050 divided by
+the number of points returned by the FFT; approximately 22050/256 ~ 86 Hz. This is terrible if I want any
+resolution in lower octaves, since I low octave could be as skinny as 20 Hz. So, to gain more resolution
+I would need a larger buffer that accumulates several audio blocks worth of data (perhaps 4096 samples)
+which would provide a resolution of 22050/2048 ~ 10.7 Hz. This would lead to the complicated issue making
+the GUI look energetic, since the GUI would be updating much more slowly.
+
+How I can improve it:
+First, I want the transport bar on the bottom to display times (right now it is showing percents). After
+that, I need to increase my spectral resolution, so that I can increase the number of peaks. Then, the
+next step would be to get the GUI to move or interpolate between successive updates to the spectral peaks.
+Then I would create special buttons/fonts to make the GUI look more professional. These all come at the cost
+of CPU, so I need to figure out how to reduce that too. 
 
