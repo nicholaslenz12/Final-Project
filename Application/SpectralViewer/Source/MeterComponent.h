@@ -48,7 +48,7 @@ private:
     bool graphicsLocked;      // If the graphics are locked (can't be drawn) is set to true.
     float RMS;                // The RMS of a signal.
     unsigned componentHeight; // Height of graphic component in pixels.
-    unsigned componentWidth;  // Height of graphic component in pixels.
+    unsigned componentWidth;  // Width of graphic component in pixels.
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MeterComponent)
 };

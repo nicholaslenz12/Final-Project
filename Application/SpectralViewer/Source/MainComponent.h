@@ -59,19 +59,19 @@ private:
     void openClicked();
     
     /**
-     Provides the functionality for the Play button being clicked. Essentially, tells
+     Provides the functionality for the play button being clicked. Essentially, tells
          the currently focused spot in the project to move forward in the file.
      */
     void playClicked();
     
     /**
-     Provides the functionality for the Puase button being clicked. Essentially, tells
+     Provides the functionality for the pause button being clicked. Essentially, tells
          the currently focused spot in the project to remember its current position.
      */
     void pauseClicked();
     
     /**
-     Provides the functionality for the Stop button being clicked. Essentially, tells
+     Provides the functionality for the stop button being clicked. Essentially, tells
          the currently focused spot to move back to the start of the project.
      */
     void stopClicked();
@@ -98,7 +98,7 @@ private:
     void changeListenerCallback (ChangeBroadcaster* source) override;
     
     /**
-     This function is called every 100 milliseconds specified by the function startTimer(100) function
+     This function is called every 100 milliseconds specified by the function startTimer(100)
          called in the contructor of MainComponent.
      */
     void timerCallback() override;
@@ -107,10 +107,10 @@ private:
     //==============================================================================================================
     
     // Every text button will appear on the GUI.
-    TextButton open;    // Object so that I can open a file.
-    TextButton play;    // Object so that I can play the selected file.
-    TextButton pause;   // Object so that I can pause the selected file.
-    TextButton stop;    // Object so that I can stop the selected file.
+    TextButton open;    // Button so that I can open a file.
+    TextButton play;    // Button so that I can play the selected file.
+    TextButton pause;   // Button so that I can pause the selected file.
+    TextButton stop;    // Button so that I can stop the selected file.
     
     Label fiftyPer;         // Marks 50% through the audio file.
     Label twentyFivePer;    // Marks 25% through the audio file.
@@ -118,7 +118,7 @@ private:
         
     SpectralViewComponent spectrum; // Component that holds the functionality of the spectrum-viewer.
     MeterComponent meter;           // Component that holds the functionality of the volume meter.
-    Slider transportProgress;       // Object that shows how far through the audio file we are.    
+    Slider transportProgress;       // Object that shows how far through the audio file the app is are.    
     
     AudioFormatManager filetypeManager; // Manages the file type (.mp3, .wav, ...).
     std::unique_ptr<AudioFormatReaderSource> fileSource; // Points to source properties of the file.

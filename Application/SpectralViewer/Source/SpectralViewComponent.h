@@ -53,10 +53,10 @@ private:
     Label minusTwentyFourDecibels;
     
     std::vector<Rectangle<float>> peaks; // Stores the rectangles that form the spectrum display.
-    bool graphicsLocked; // Bool that returns false if the FFT routine is running.
+    bool graphicsLocked; // Boolean that returns false if the FFT routine is running.
     unsigned componentHeight; // Height of graphic component in pixels.
-    unsigned componentWidth; // Height of graphic component in pixels.
-    int      orderFFT;       // Order of the FFT.
+    unsigned componentWidth;  // Width of graphic component in pixels.
+    int      orderFFT;        // Order of the FFT.
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectralViewComponent)
 };

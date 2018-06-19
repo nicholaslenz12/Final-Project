@@ -20,4 +20,5 @@ This repository contains the source files I used to create my application, a rep
 
 ## Here's a picture of my app:
 ![Spectrum Analysis](MyGUI.png)
-And [here](https://drive.google.com/file/d/15JP6mvoeYjkq1Pq9BZY8vbRnD7ocD0UC/view?usp=sharing "Google Drive Movie")'s a link to a video of me using the app.  
+And here's [a link to a video](https://drive.google.com/file/d/15JP6mvoeYjkq1Pq9BZY8vbRnD7ocD0UC/view?usp=sharing "Google Drive Movie") of me using the app.  
+And, if you are using OS X, here's [the OS X version of the app](https://drive.google.com/drive/folders/1QNt7Qeyj8qh5hkbJtLkiXDZrUTzV-Fpw?usp=sharing "Google Drive App") compiled using c++14 with Xcode's compiler LLVM 9. To download the app, download the entire SpectralView.app folder, and the application should be located in the MacOS folder.

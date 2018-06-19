@@ -25,7 +25,7 @@ MainComponent::MainComponent() :    state(Stopped),
     // Specifies the number of input and output channels that we want to open.
     setAudioChannels (2, 2);
     
-    // Makes all the buttons visibible.
+    // Makes all the buttons visible.
     addAndMakeVisible(&open);
     addAndMakeVisible(&play);
     addAndMakeVisible(&pause);
@@ -42,7 +42,7 @@ MainComponent::MainComponent() :    state(Stopped),
     pause.setEnabled(false);
     stop.setEnabled(false);
     
-    // Sets the colors of the buttons to make them look nicer.
+    // Sets the colors of the buttons.
     open.setColour(TextButton::buttonColourId, Colour(255,212,22));
     open.setColour(TextButton::textColourOffId, Colours::black);
     play.setColour(TextButton::buttonColourId, Colours::green);
@@ -53,7 +53,7 @@ MainComponent::MainComponent() :    state(Stopped),
     stop.setColour(TextButton::textColourOffId, Colours::black);
     
     /*
-       Provides the functionality for the buttons, i.e. once they are clicked
+       Provides the functionality for the buttons, i.e., once they are clicked
        their appropriate functions are called using a lambda function.
        open, play, and stop have been adapted from JUCE's tutorial "Build an
        audio player".
@@ -91,7 +91,7 @@ MainComponent::MainComponent() :    state(Stopped),
     transportProgress.setTextValueSuffix(" %");
     transportProgress.setNumDecimalPlacesToDisplay(0);
     
-    // Prevents/enables so functionality of the transport/slider bar.
+    // Prevents/enables specific functionality of the transport/slider bar.
     transportProgress.setTextBoxIsEditable(false);
     transportProgress.setSliderSnapsToMousePosition(true);
 
@@ -110,7 +110,7 @@ MainComponent::MainComponent() :    state(Stopped),
     twentyFivePer.setColour(Label::textColourId, Colour(255,212,22));
     twentyFivePer.setText("25", dontSendNotification);
     twentyFivePer.setJustificationType(Justification::left);
-    seventyFivePer.setColour(Label::textColourId, Colour(255,212    ,22));
+    seventyFivePer.setColour(Label::textColourId, Colour(255,212,22));
     seventyFivePer.setText("75", dontSendNotification);
     seventyFivePer.setJustificationType(Justification::right);
     
@@ -121,9 +121,9 @@ MainComponent::MainComponent() :    state(Stopped),
 
 MainComponent::~MainComponent()
 {
-    delete[] buffer; // Dealloacates the memory the buffer stored audio in.
-    buffer = nullptr; // Sets buffer to nullptr.
-    shutdownAudio(); // This shuts down the audio device and clears the audio source.
+    delete[] buffer;  // Dealloacates the memory the buffer stored audio data in.
+    buffer = nullptr; // To prevent possible bad dereferencing.
+    shutdownAudio();  // This shuts down the audio device and clears the audio source.
 }
 
 //==============================================================================================================
@@ -146,7 +146,7 @@ void MainComponent::openClicked()
             sampleFreq = fileReader->sampleRate;
             fileLength = (static_cast<double>(fileReader->lengthInSamples)/sampleFreq);
             
-            play.setEnabled(true); // Prepares the play button so that it can play.
+            play.setEnabled(true); // Activates the play button so that the user can press it and start the app.
             fileSource.reset(selectedFileSource.release());
         }
         open.setButtonText(selectedFile.getFileName()); // Displays the filename.

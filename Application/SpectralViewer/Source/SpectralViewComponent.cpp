@@ -39,7 +39,7 @@ SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
     minusTwentyFourDecibels.setText("-24 dBFS", dontSendNotification);
     minusTwentyFourDecibels.setColour(Label::textColourId, Colours::black);
     minusTwentyFourDecibels.setJustificationType(Justification::right);
-    
+        
 }
 
 SpectralViewComponent::~SpectralViewComponent() {}
@@ -75,7 +75,7 @@ void SpectralViewComponent::createPeaks(float* bufferToFill, int bufferSize)
         dsp::FFT frequncyFFT(orderFFT - 1);
         frequncyFFT.performFrequencyOnlyForwardTransform(samplesForTransform);
     
-        for( auto i = 0; i < halfSize; ++i )
+        for( unsigned i = 0; i < halfSize; ++i )
         {
             samplesForTransform[i] = samplesForTransform[i]/100;
         }
