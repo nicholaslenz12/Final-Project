@@ -60,7 +60,7 @@ private:
     void playClicked();
     
     /** Provides the functionality for the pause button being clicked. Essentially, tells
-        the currently focused spot in the project to remember its current position.
+        the currently focused spot in the project to "remember" its current position.
      */
     void pauseClicked();
     
