@@ -21,8 +21,6 @@ class SpectralViewComponent     :   public Component
 
 {
 public:
-    static const unsigned lowerLimit; // Corresponds to 20 Hz, the lower end of human hearing.
-    static const unsigned upperLimit; // Corresponds to 20560 Hz, just above the upper end of human hearing.
     
     //==========================================================================================================
     SpectralViewComponent();

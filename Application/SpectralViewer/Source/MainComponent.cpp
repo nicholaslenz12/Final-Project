@@ -114,16 +114,17 @@ MainComponent::MainComponent() :    state(Stopped),
     seventyFivePer.setText("75", dontSendNotification);
     seventyFivePer.setJustificationType(Justification::right);
     
-    startTimer(100); // Starts the internal timing for the project. Corresponds to 1000/100 = 10 frames/second.
-    filetypeManager.registerBasicFormats(); // Allows the user to select standard audio filetypes.
-    projectSource.addChangeListener(this); // Adds a listener for button presses.
+    startTimerHz(10);
+    filetypeManager.registerBasicFormats();
+    projectSource.addChangeListener(this);
 }
 
 MainComponent::~MainComponent()
 {
-    delete[] buffer;  // Dealloacates the memory the buffer stored audio data in.
-    buffer = nullptr; // To prevent possible bad dereferencing.
-    shutdownAudio();  // This shuts down the audio device and clears the audio source.
+    // Deallocates dynamic memory.
+    delete[] buffer;
+    buffer = nullptr;
+    shutdownAudio();
 }
 
 //==============================================================================================================
@@ -132,7 +133,7 @@ void MainComponent::openClicked()
     FileChooser findFile("Select an audio file to play.", File::nonexistent, ""); // Creates a file chooser object.
     
     if( findFile.browseForFileToOpen() ) // If the native file browser opens and the user opens a file.
-                                          
+        
     {
         auto selectedFile = findFile.getResult(); // Sets the selected file to the one choosen.
         auto* fileReader = filetypeManager.createReaderFor(selectedFile); // Creates a file reader.

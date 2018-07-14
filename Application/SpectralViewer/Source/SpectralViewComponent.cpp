@@ -11,9 +11,6 @@
 #include "SpectralViewComponent.h"
 
 //==============================================================================================================
-const unsigned SpectralViewComponent::lowerLimit = 20;
-const unsigned SpectralViewComponent::upperLimit = 20560;
-
 SpectralViewComponent::SpectralViewComponent() :    graphicsLocked(true),
                                                     componentHeight(getHeight()),
                                                     componentWidth(getWidth()),
